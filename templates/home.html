@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans 'Home' %}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row align-items-center">
+        <div class="col-lg-6 mb-4 mb-lg-0">
+            <h1 class="display-4 fw-bold mb-3 text-primary">
+                {% trans "Welcome to" %} <span class="text-success">{{ site_settings.site_name }}</span>
+            </h1>
+            <p class="lead mb-4">
+                {% trans "Your gateway to knowledge, creativity, and success. Start your learning journey with us!" %}
+            </p>
+            <a href="#" class="btn btn-success btn-lg px-4 py-2 me-2">{% trans "Browse Courses" %}</a>
+            <a href="#" class="btn btn-outline-primary btn-lg px-4 py-2">{% trans "Contact Us" %}</a>
+        </div>
+        <div class="col-lg-6 text-center">
+            {% if site_settings.logo %}
+                <img src="{{ site_settings.logo.url }}" alt="{{ site_settings.site_name }}" class="img-fluid rounded shadow" style="max-height: 320px;">
+            {% else %}
+                <img src="https://cdn.pixabay.com/photo/2017/01/10/19/05/education-1976107_960_720.png" alt="Learning" class="img-fluid rounded shadow" style="max-height: 320px;">
+            {% endif %}
+        </div>
+    </div>
+    <div class="row mt-5">
+        <div class="col-12 text-center">
+            <h2 class="fw-bold mb-4">{% trans "Why Choose Us?" %}</h2>
+        </div>
+        <div class="col-md-4 text-center mb-4">
+            <div class="card border-0 shadow h-100">
+                <div class="card-body">
+                    <i class="bi bi-mortarboard-fill display-4 text-success mb-3"></i>
+                    <h5 class="card-title">{% trans "Expert Instructors" %}</h5>
+                    <p class="card-text">{% trans "Learn from experienced and passionate teachers." %}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 text-center mb-4">
+            <div class="card border-0 shadow h-100">
+                <div class="card-body">
+                    <i class="bi bi-laptop-fill display-4 text-primary mb-3"></i>
+                    <h5 class="card-title">{% trans "Modern Platform" %}</h5>
+                    <p class="card-text">{% trans "Enjoy an interactive and user-friendly learning experience." %}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 text-center mb-4">
+            <div class="card border-0 shadow h-100">
+                <div class="card-body">
+                    <i class="bi bi-people-fill display-4 text-warning mb-3"></i>
+                    <h5 class="card-title">{% trans "Community Support" %}</h5>
+                    <p class="card-text">{% trans "Join a vibrant community of learners and educators." %}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Bootstrap Icons CDN -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+{% endblock %}
