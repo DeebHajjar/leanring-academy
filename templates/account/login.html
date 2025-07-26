@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load socialaccount %}
+
+{% block title %}{% trans "Login" %}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white text-center">
+                    <h3>{% trans "Login" %}</h3>
+                </div>
+                <div class="card-body">
+                    <!-- Google Login -->
+                    <div class="d-grid gap-2 mb-4">
+                        <a href="{% provider_login_url 'google' %}" 
+                           class="btn btn-danger btn-lg">
+                            <i class="fab fa-google me-2"></i>
+                            {% trans "Login with Google" %}
+                        </a>
+                    </div>
+                    
+                    <!-- Divider -->
+                    <div class="text-center my-3">
+                        <span class="text-muted">{% trans "or" %}</span>
+                    </div>
+                    
+                    <!-- Traditional Login Form -->
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <!-- Error Messages -->
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.non_field_errors %}
+                                    <div>{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        
+                        <div class="mb-3">
+                            <label for="id_login" class="form-label">
+                                {% trans "Email" %}
+                            </label>
+                            <input type="email" 
+                                   class="form-control" 
+                                   id="id_login" 
+                                   name="login" 
+                                   required>
+                            {% if form.login.errors %}
+                                <div class="text-danger">
+                                    {{ form.login.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="id_password" class="form-label">
+                                {% trans "Password" %}
+                            </label>
+                            <input type="password" 
+                                   class="form-control" 
+                                   id="id_password" 
+                                   name="password" 
+                                   required>
+                            {% if form.password.errors %}
+                                <div class="text-danger">
+                                    {{ form.password.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" 
+                                   class="form-check-input" 
+                                   id="id_remember" 
+                                   name="remember">
+                            <label class="form-check-label" for="id_remember">
+                                {% trans "Remember me" %}
+                            </label>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">
+                                {% trans "Login" %}
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <!-- Additional Links -->
+                    <div class="text-center mt-3">
+                        <p>
+                            <a href="{% url 'account_reset_password' %}">
+                                {% trans "Forgot Password?" %}
+                            </a>
+                        </p>
+                        <p>
+                            {% trans "Don't have an account?" %}
+                            <a href="{% url 'account_signup' %}">
+                                {% trans "Create New Account" %}
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-24 15:34+0300\n"
+"POT-Creation-Date: 2025-07-26 18:55+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,6 +18,135 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
 "&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+
+#: .\templates\account\login.html:5 .\templates\account\login.html:13
+#: .\templates\account\login.html:87 .\templates\account\signup.html:116
+#: .\templates\partials\navbar.html:29
+msgid "Login"
+msgstr "تسجيل الدخول"
+
+#: .\templates\account\login.html:21 .\templates\account\signup.html:21
+msgid "Login with Google"
+msgstr "تسجيل الدخول باستخدام Google"
+
+#: .\templates\account\login.html:27 .\templates\account\signup.html:26
+#: .\venv\Lib\site-packages\django\utils\text.py:287
+msgid "or"
+msgstr "أو"
+
+#: .\templates\account\login.html:45 .\templates\account\profile.html:24
+#: .\templates\account\signup.html:43
+msgid "Email"
+msgstr "البريد الإلكتروني"
+
+#: .\templates\account\login.html:61 .\templates\account\signup.html:75
+msgid "Password"
+msgstr "كلمة المرور"
+
+#: .\templates\account\login.html:81
+msgid "Remember me"
+msgstr "تذكرني"
+
+#: .\templates\account\login.html:96
+msgid "Forgot Password?"
+msgstr "نسيت كلمة المرور؟"
+
+#: .\templates\account\login.html:100
+msgid "Don't have an account?"
+msgstr "ليس لديك حساب؟"
+
+#: .\templates\account\login.html:102 .\templates\account\signup.html:5
+#: .\templates\account\signup.html:13
+msgid "Create New Account"
+msgstr "إنشاء حساب جديد"
+
+#: .\templates\account\logout.html:5 .\templates\account\logout.html:13
+#: .\templates\account\logout.html:19
+msgid "Sign Out"
+msgstr "تسجيل الخروج"
+
+#: .\templates\account\logout.html:16
+msgid "Are you sure you want to sign out?"
+msgstr "هل أنت متأكد من تسجيل الخروج؟"
+
+#: .\templates\account\profile.html:4 .\templates\partials\navbar.html:20
+msgid "Profile"
+msgstr "الملف الشخصي"
+
+#: .\templates\account\profile.html:26
+msgid "Phone"
+msgstr "الهاتف"
+
+#: .\templates\account\profile.html:29
+msgid "Country"
+msgstr "البلد"
+
+#: .\templates\account\profile.html:32
+msgid "City"
+msgstr "المدينة"
+
+#: .\templates\account\profile.html:34
+#, fuzzy
+#| msgid "Expert Instructors"
+msgid "Instructor"
+msgstr "المدربين المحترفين"
+
+#: .\templates\account\profile.html:34
+msgid "Student"
+msgstr "الطالب"
+
+#: .\templates\account\profile.html:36
+msgid "Verified"
+msgstr "تم التحقق"
+
+#: .\templates\account\profile.html:46
+msgid "Profile Details"
+msgstr "تفاصيل الملف الشخصي"
+
+#: .\templates\account\profile.html:49
+msgid "Website"
+msgstr "الموقع الإلكتروني"
+
+#: .\templates\account\profile.html:52
+msgid "LinkedIn"
+msgstr "لينكد إن"
+
+#: .\templates\account\profile.html:55
+msgid "GitHub"
+msgstr "جيت هاب"
+
+#: .\templates\account\profile.html:57
+msgid "Preferred Language"
+msgstr "اللغة المفضلة"
+
+#: .\templates\account\profile.html:63 .\templates\account\profile_edit.html:4
+#: .\templates\account\profile_edit.html:12
+msgid "Edit Profile"
+msgstr "تعديل الملف الشخصي"
+
+#: .\templates\account\profile_edit.html:17
+msgid "Save Changes"
+msgstr "حفظ التغييرات"
+
+#: .\templates\account\profile_edit.html:18
+msgid "Cancel"
+msgstr "إلغاء"
+
+#: .\templates\account\signup.html:59
+msgid "Username"
+msgstr "اسم المستخدم"
+
+#: .\templates\account\signup.html:91
+msgid "Confirm Password"
+msgstr "تأكيد كلمة المرور"
+
+#: .\templates\account\signup.html:107
+msgid "Create Account"
+msgstr "إنشاء حساب جديد"
+
+#: .\templates\account\signup.html:114
+msgid "Already have an account?"
+msgstr "هل لديك حساب؟"
 
 #: .\templates\home.html:4
 msgid "Home"
@@ -80,6 +209,24 @@ msgstr "سياسة الخصوصية"
 #: .\templates\partials\footer.html:11
 msgid "Terms of Use"
 msgstr "شروط الاستخدام"
+
+#: .\templates\partials\navbar.html:23
+msgid "Logout"
+msgstr "تسجيل الخروج"
+
+#: .\templates\partials\navbar.html:32
+msgid "Sign Up"
+msgstr "تسجيل جديد"
+
+#: .\templates\socialaccount\login.html:5
+#: .\templates\socialaccount\login.html:13
+#: .\templates\socialaccount\login.html:21
+msgid "Sign In with Google"
+msgstr "تسجيل الدخول باستخدام Google"
+
+#: .\templates\socialaccount\login.html:16
+msgid "Sign in with Google to access your account."
+msgstr "تسجيل الدخول باستخدام Google للاستفادة من حسابك."
 
 #: .\venv\Lib\site-packages\django\contrib\messages\apps.py:16
 msgid "Messages"
@@ -1082,10 +1229,6 @@ msgstr ""
 #, python-format
 msgctxt "String to return when truncating text"
 msgid "%(truncated_text)s…"
-msgstr ""
-
-#: .\venv\Lib\site-packages\django\utils\text.py:287
-msgid "or"
 msgstr ""
 
 #. Translators: This string is used as a separator between list elements

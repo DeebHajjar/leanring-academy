@@ -5,14 +5,42 @@
         <a class="navbar-brand" href="{% url 'home' %}">{{ site_settings.site_name }}</a>
         
         <!-- Language Switcher -->
-        <div class="dropdown">
-            <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                {% if LANGUAGE_CODE == 'ar' %}العربية{% else %}English{% endif %}
-            </button>
-            <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="/ar/">العربية</a></li>
-                <li><a class="dropdown-item" href="/">English</a></li>
+        <form action="{% url 'set_language_and_save' %}" method="post" class="d-inline">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <div class="dropdown d-inline">
+                <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    {% if LANGUAGE_CODE == 'ar' %}العربية{% else %}English{% endif %}
+                </button>
+                <ul class="dropdown-menu">
+                    <li>
+                        <button class="dropdown-item" type="submit" name="language" value="ar">العربية</button>
+                    </li>
+                    <li>
+                        <button class="dropdown-item" type="submit" name="language" value="en">English</button>
+                    </li>
+                </ul>
+            </div>
+        </form>
+            {% if request.user.is_authenticated %}
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'profile' request.user.username %}">{% trans 'Profile' %}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'account_logout' %}">{% trans 'Logout' %}</a>
+                </li>
             </ul>
-        </div>
+            {% else %}
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'login' %}">{% trans 'Login' %}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'signup' %}">{% trans 'Sign Up' %}</a>
+                </li>
+            </ul>
+            {% endif %}
+
     </div>
 </nav>
