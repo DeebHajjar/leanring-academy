@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-26 18:55+0300\n"
+"POT-Creation-Date: 2025-07-31 15:11+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,9 +19,105 @@ msgstr ""
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
 "&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
 
+#: .\courses\forms.py:19
+msgid "Write your review..."
+msgstr "اكتب تقييمك..."
+
+#: .\courses\forms.py:33 .\templates\courses\lesson_detail.html:34
+msgid "Write your comment..."
+msgstr "اكتب تعليقك..."
+
+#: .\courses\forms.py:44 .\courses\forms.py:82
+#: .\templates\courses\course_list.html:12
+msgid "Search courses..."
+msgstr "بحث الدورات..."
+
+#: .\courses\forms.py:45 .\courses\forms.py:83
+msgid "Search courses"
+msgstr "بحث الدورات"
+
+#: .\courses\forms.py:50 .\courses\forms.py:88
+#: .\templates\courses\course_list.html:14
+msgid "All levels"
+msgstr "جميع المستويات"
+
+#: .\courses\forms.py:61 .\courses\forms.py:99
+#: .\templates\courses\course_list.html:19
+msgid "Min price"
+msgstr "السعر الأدنى"
+
+#: .\courses\forms.py:70 .\courses\forms.py:108
+#: .\templates\courses\course_list.html:20
+msgid "Max price"
+msgstr "السعر الأقصى"
+
+#: .\courses\models.py:27 .\templates\courses\course_list.html:15
+msgid "Beginner"
+msgstr "مبتدئ"
+
+#: .\courses\models.py:28 .\templates\courses\course_list.html:16
+msgid "Intermediate"
+msgstr "متوسط"
+
+#: .\courses\models.py:29 .\templates\courses\course_list.html:17
+msgid "Advanced"
+msgstr "متقدم"
+
+#: .\courses\models.py:33
+msgid "Draft"
+msgstr "مسودة"
+
+#: .\courses\models.py:34
+msgid "Published"
+msgstr "نشرت"
+
+#: .\courses\models.py:35
+msgid "Archived"
+msgstr "مؤرشف"
+
+#: .\courses\views.py:104
+msgid "You must enroll in the course to access this lesson."
+msgstr "يجب عليك التسجيل في الدورة للاستفادة من هذا الدرس."
+
+#: .\courses\views.py:114 .\courses\views.py:122
+msgid "You are not enrolled in this course."
+msgstr "أنت لست مسجل في هذه الدورة."
+
+#: .\courses\views.py:150
+msgid "You must enroll in the course to add a review."
+msgstr "يجب عليك التسجيل في الدورة لاضافة تقييم. "
+
+#: .\courses\views.py:154
+msgid "You have already reviewed this course."
+msgstr "لقد قمت بالفعل بكتابة تقييم لهذه الدورة."
+
+#: .\courses\views.py:170
+msgid "Review added successfully!"
+msgstr "تم إضافة التقييم بنجاح!"
+
+#: .\courses\views.py:172
+msgid "Please correct the errors in your review."
+msgstr "الرجاء تصحيح الأخطاء في تقييمك."
+
+#: .\courses\views.py:200
+msgid "You must enroll in this course to access its lessons."
+msgstr "يجب عليك التسجيل في هذه الدورة للاستفادة من دروسها."
+
+#: .\courses\views.py:236
+msgid "You must be enrolled to comment on this lesson."
+msgstr "يجب عليك التسجيل في هذه الدورة للاستفادة من دروسها."
+
+#: .\courses\views.py:252
+msgid "Comment added successfully!"
+msgstr "تم إضافة التعليق بنجاح!"
+
+#: .\courses\views.py:254
+msgid "Please correct the errors in your comment."
+msgstr "الرجاء تصحيح الأخطاء في تعليقك."
+
 #: .\templates\account\login.html:5 .\templates\account\login.html:13
 #: .\templates\account\login.html:87 .\templates\account\signup.html:116
-#: .\templates\partials\navbar.html:29
+#: .\templates\partials\navbar.html:51
 msgid "Login"
 msgstr "تسجيل الدخول"
 
@@ -69,7 +165,7 @@ msgstr "تسجيل الخروج"
 msgid "Are you sure you want to sign out?"
 msgstr "هل أنت متأكد من تسجيل الخروج؟"
 
-#: .\templates\account\profile.html:4 .\templates\partials\navbar.html:20
+#: .\templates\account\profile.html:4 .\templates\partials\navbar.html:42
 msgid "Profile"
 msgstr "الملف الشخصي"
 
@@ -148,6 +244,152 @@ msgstr "إنشاء حساب جديد"
 msgid "Already have an account?"
 msgstr "هل لديك حساب؟"
 
+#: .\templates\courses\course_detail.html:29
+#: .\templates\courses\my_lessons.html:11
+msgid "Lessons"
+msgstr "الدروس"
+
+#: .\templates\courses\course_detail.html:36
+msgid "Paid"
+msgstr "مدفوع"
+
+#: .\templates\courses\course_detail.html:40
+msgid "No lessons available."
+msgstr "لا يوجد دروس متاحة."
+
+#: .\templates\courses\course_detail.html:48
+msgid "Reviews"
+msgstr "التقييمات"
+
+#: .\templates\courses\course_detail.html:58
+msgid "No reviews yet."
+msgstr "لا يوجد تقييمات بعد."
+
+#: .\templates\courses\course_detail.html:60
+msgid "Add Review"
+msgstr "إضافة تقييم"
+
+#: .\templates\courses\course_detail.html:64
+#: .\templates\courses\course_list.html:25
+msgid "Rating"
+msgstr "التقييم"
+
+#: .\templates\courses\course_detail.html:76
+msgid "Submit Review"
+msgstr "إرسال تقييم"
+
+#: .\templates\courses\course_list.html:5
+msgid "Courses"
+msgstr "الدورات"
+
+#: .\templates\courses\course_list.html:22
+msgid "Sort by"
+msgstr "ترتيب حسب"
+
+#: .\templates\courses\course_list.html:23
+msgid "Price (low to high)"
+msgstr "السعر (من الأدنى إلى الأعلى)"
+
+#: .\templates\courses\course_list.html:24
+msgid "Price (high to low)"
+msgstr "السعر (من الأعلى إلى الأدنى)"
+
+#: .\templates\courses\course_list.html:26
+#, fuzzy
+#| msgid "Student"
+msgid "Students"
+msgstr "الطالب"
+
+#: .\templates\courses\course_list.html:28
+msgid "Filter"
+msgstr "تصفية"
+
+#: .\templates\courses\course_list.html:38
+#: .\templates\courses\my_courses.html:24 .\templates\home.html:72
+msgid "View Course"
+msgstr "عرض الدورات"
+
+#: .\templates\courses\instructor_detail.html:19
+msgid "Expertise"
+msgstr "المهارات"
+
+#: .\templates\courses\instructor_detail.html:20
+msgid "Years of Experience"
+msgstr "الخبرة"
+
+#: .\templates\courses\instructor_detail.html:21
+msgid "Total Courses"
+msgstr "مجموع الدورات"
+
+#: .\templates\courses\instructor_detail.html:22
+msgid "Courses by this instructor"
+msgstr "الدورات لهذا المدرب"
+
+#: .\templates\courses\instructor_detail.html:29
+msgid "No courses found."
+msgstr "لا يوجد دورات متاحة."
+
+#: .\templates\courses\lesson_detail.html:21
+msgid "<"
+msgstr "<"
+
+#: .\templates\courses\lesson_detail.html:24
+msgid ">"
+msgstr ">"
+
+#: .\templates\courses\lesson_detail.html:30
+#: .\templates\courses\lesson_detail.html:35
+msgid "Add Comment"
+msgstr "إضافة تعليق"
+
+#: .\templates\courses\lesson_detail.html:41
+msgid "Comments"
+msgstr "تعليقات"
+
+#: .\templates\courses\lesson_detail.html:51
+#: .\templates\courses\lesson_detail.html:70
+msgid "Reply"
+msgstr "إجابة"
+
+#: .\templates\courses\lesson_detail.html:56
+#: .\templates\courses\lesson_detail.html:74
+msgid "Write your reply..."
+msgstr "اكتب ردك..."
+
+#: .\templates\courses\lesson_detail.html:57
+#: .\templates\courses\lesson_detail.html:75
+msgid "Add Reply"
+msgstr "إضافة رد"
+
+#: .\templates\courses\my_courses.html:5 .\templates\courses\my_courses.html:9
+#: .\templates\partials\navbar.html:30
+msgid "My Courses"
+msgstr "دوراتي"
+
+#: .\templates\courses\my_courses.html:13
+msgid "You have not enrolled in any courses yet."
+msgstr "لا يوجد دورات متاحة"
+
+#: .\templates\courses\my_courses.html:14 .\templates\home.html:16
+msgid "Browse Courses"
+msgstr "تصفح الدورات"
+
+#: .\templates\courses\my_lessons.html:18
+msgid "Completed"
+msgstr "مكمل"
+
+#: .\templates\courses\my_lessons.html:21
+msgid "Watched"
+msgstr "شاهد"
+
+#: .\templates\courses\my_lessons.html:21
+msgid "seconds"
+msgstr "ثواني"
+
+#: .\templates\courses\my_lessons.html:25
+msgid "Not started"
+msgstr "لم يبدأ"
+
 #: .\templates\home.html:4
 msgid "Home"
 msgstr "الرئيسية"
@@ -161,10 +403,6 @@ msgid ""
 "Your gateway to knowledge, creativity, and success. Start your learning "
 "journey with us!"
 msgstr "بوابتك نحو المعرفة والإبداع والنجاح. ابدأ رحلة التعلم معنا!"
-
-#: .\templates\home.html:16
-msgid "Browse Courses"
-msgstr "تصفح الدورات"
 
 #: .\templates\home.html:17
 msgid "Contact Us"
@@ -198,6 +436,14 @@ msgstr "دعم المجتمع"
 msgid "Join a vibrant community of learners and educators."
 msgstr "انضم إلى مجتمع نابض بالحياة من المتعلمين والمعلمين. "
 
+#: .\templates\home.html:60
+msgid "Featured Courses"
+msgstr "الدورات المميزة"
+
+#: .\templates\home.html:80
+msgid "No courses available."
+msgstr "لا يوجد دورات متاحة."
+
 #: .\templates\partials\footer.html:7
 msgid "All rights reserved."
 msgstr "جميع الحقوق محفوظة."
@@ -210,11 +456,19 @@ msgstr "سياسة الخصوصية"
 msgid "Terms of Use"
 msgstr "شروط الاستخدام"
 
-#: .\templates\partials\navbar.html:23
+#: .\templates\partials\navbar.html:27
+msgid "All Courses"
+msgstr "الدورات"
+
+#: .\templates\partials\navbar.html:35
+msgid "Admin"
+msgstr "الإدارة"
+
+#: .\templates\partials\navbar.html:45
 msgid "Logout"
 msgstr "تسجيل الخروج"
 
-#: .\templates\partials\navbar.html:32
+#: .\templates\partials\navbar.html:54
 msgid "Sign Up"
 msgstr "تسجيل جديد"
 

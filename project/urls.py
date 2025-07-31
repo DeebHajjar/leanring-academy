@@ -13,6 +13,7 @@ urlpatterns += i18n_patterns(
     path('', include('core.urls')),
     path('accounts/', include('allauth.urls')),
     path('accounts/', include('accounts.urls')),
+    path('courses/', include('courses.urls')),
     prefix_default_language=False
 )
 

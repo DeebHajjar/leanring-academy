@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load socialaccount %}
+
+{% block title %}{% trans 'My Courses' %}{% endblock %}
+
+{% block content %}
+    <div class="container py-5">
+        <h1>{% trans 'My Courses' %}</h1>
+        <div class="row">
+            {% if not page_obj %}
+            <div class="col-md-12">
+                <p>{% trans 'You have not enrolled in any courses yet.' %}</p>
+                <a href="{% url 'courses:course_list' %}" class="btn btn-primary">{% trans 'Browse Courses' %}</a>
+            </div>
+            {% endif %}
+            {% for enrollment in page_obj %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <img src="{{ enrollment.course.thumbnail.url }}" class="card-img-top" alt="{{ enrollment.course.title }}">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ enrollment.course.title }}</h5>
+                        <p class="card-text">{{ enrollment.course.short_description }}</p>
+                        <a href="{% url 'courses:my_lessons' enrollment.course.slug %}" class="btn btn-primary">{% trans "View Course" %}</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

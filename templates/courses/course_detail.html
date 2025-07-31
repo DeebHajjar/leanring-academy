@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load socialaccount %}
+
+{% block title %}{% trans course.title %}{% endblock %}
+
+{% block content %}
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-md-8">
+                <video src="{{ course.video_preview.url }}" autoplay controls class="w-100"></video>
+            </div>
+            <div class="col-md-4">
+                <h2>{{ course.title }}</h2>
+                <p>{{ course.description }}</p>
+                <p>{{ course.price }}</p>
+                <p>{{ course.difficulty }}</p>
+                <p>{{ course.duration_hours }}</p>
+                <p>{{ course.language }}</p>
+                <p>{{ course.requirements }}</p>
+                <p>{{ course.what_you_learn }}</p>
+                <p>By:
+                    <a href="{% url 'courses:instructor_detail' course.instructor.user.username %}">
+                        {{ course.instructor.user.get_full_name }}
+                    </a>
+                </p>
+            </div>
+            <div class="col-md-8">
+                <h2>{% trans "Lessons" %}</h2>
+                <ul>
+                    {% if lessons %}
+                    {% for lesson in lessons %}
+                    {% if lesson.is_free %}
+                        <li><a href="{% url 'courses:lesson_detail' course.slug lesson.id %}">{{ lesson.title }}</a></li>
+                    {% else %}
+                        <li>{{ lesson.title }} <span class="badge bg-primary">{% trans "Paid" %}</span></li>
+                    {% endif %}
+                    {% endfor %}
+                    {% else %}
+                    <p>{% trans "No lessons available." %}</p>
+                    {% endif %}
+                </ul>
+            </div>
+            <div class="col-md-4">
+            </div>
+            <div class="col-md-12">
+                <form method="post" action="{% url 'courses:add_review' course.slug %}">
+                    <h2>{% trans "Reviews" %}</h2>
+                    {% if reviews %}
+                    <p>Rating: {{ course.rating }} ⭐</p>
+                    <p>Total Reviews: {{ course.total_reviews }}</p>
+                    <ul>
+                        {% for review in reviews %}
+                            <li>{{ review.student.username }} - {{ review.rating }} ⭐ - {{ review.comment }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p>{% trans "No reviews yet." %}</p>
+                    {% endif %}
+                    <h2>{% trans "Add Review" %}</h2>
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label for="rating">{% trans "Rating" %}</label>
+                        <select name="rating" id="rating" class="form-select">
+                            {% for i in "12345" %}
+                                <option value="{{ i }}">{{ i }} ⭐</option>
+                            {% endfor %}
+                        </select>
+
+                    </div>
+                    <div class="mb-3">
+                        <label for="comment">Comment</label>
+                        <textarea name="comment" id="comment" class="form-control"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">{% trans "Submit Review" %}</button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

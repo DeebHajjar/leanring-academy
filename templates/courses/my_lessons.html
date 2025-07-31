@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load socialaccount %}
+
+{% block title %}{% trans course.title %}{% endblock %}
+
+{% block content %}
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-md-8">
+                <h2>{% trans "Lessons" %}</h2>
+                <ol>
+                    {% for lesson in lessons %}
+                        <li>
+                            <a href="{% url 'courses:lesson_detail' course.slug lesson.id %}">{{ lesson.title }}</a>
+                            {% if lesson.lesson_progress %}
+                                {% if lesson.lesson_progress.is_completed %}
+                                    <span class="badge bg-success">{% trans "Completed" %}</span>
+                                {% else %}
+                                    <span class="badge bg-info">
+                                        {% trans "Watched" %} {{ lesson.lesson_progress.watched_duration }} {% trans "seconds" %}
+                                    </span>
+                                {% endif %}
+                            {% else %}
+                                <span class="badge bg-secondary">{% trans "Not started" %}</span>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ol>
+            </div>
+        </div>
+    </div>
+{% endblock %}
