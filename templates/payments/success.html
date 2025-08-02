@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Payment Successful" %}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-body text-center p-5">
+                    <div class="mb-4">
+                        <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
+                    </div>
+                    
+                    <h2 class="text-success mb-3">{% trans "Payment Successful!" %}</h2>
+                    
+                    {% if order and course %}
+                        <p class="lead mb-4">
+                            {% blocktrans with course_title=course.title %}
+                                Thank you for purchasing "{{ course_title }}". You now have full access to the course content.
+                            {% endblocktrans %}
+                        </p>
+                        
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">{% trans "Order Details" %}</h5>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <strong>{% trans "Order ID:" %}</strong> {{ order.order_id }}
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <strong>{% trans "Amount:" %}</strong> ${{ order.amount }}
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <strong>{% trans "Course:" %}</strong> {{ course.title }}
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <strong>{% trans "Date:" %}</strong> {{ order.completed_at|date:"M d, Y" }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-center gap-3">
+                            <a href="{% url 'courses:course_detail' course.slug %}" class="btn btn-primary">
+                                <i class="fas fa-play me-2"></i>{% trans "Start Learning" %}
+                            </a>
+                            <a href="{% url 'courses:course_list' %}" class="btn btn-outline-primary">
+                                <i class="fas fa-book me-2"></i>{% trans "Browse More Courses" %}
+                            </a>
+                            <a href="{% url 'payments:order_history' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-history me-2"></i>{% trans "Order History" %}
+                            </a>
+                        </div>
+                    {% else %}
+                        <p class="lead mb-4">
+                            {% trans "Your payment has been processed successfully." %}
+                        </p>
+                        
+                        <div class="d-flex justify-content-center gap-3">
+                            <a href="{% url 'courses:course_list' %}" class="btn btn-primary">
+                                <i class="fas fa-book me-2"></i>{% trans "Browse Courses" %}
+                            </a>
+                            <a href="{% url 'payments:order_history' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-history me-2"></i>{% trans "Order History" %}
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Payment Cancelled" %}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-body text-center p-5">
+                    <div class="mb-4">
+                        <i class="fas fa-times-circle text-warning" style="font-size: 4rem;"></i>
+                    </div>
+                    
+                    <h2 class="text-warning mb-3">{% trans "Payment Cancelled" %}</h2>
+                    
+                    <p class="lead mb-4">
+                        {% trans "Your payment was cancelled. No charges were made to your account." %}
+                    </p>
+                    
+                    <p class="text-muted mb-4">
+                        {% trans "If you experienced any issues during checkout, please try again or contact our support team." %}
+                    </p>
+                    
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="{% url 'courses:course_list' %}" class="btn btn-primary">
+                            <i class="fas fa-book me-2"></i>{% trans "Browse Courses" %}
+                        </a>
+                        <a href="#" class="btn btn-outline-secondary">
+                            <i class="fas fa-envelope me-2"></i>{% trans "Contact Support" %}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

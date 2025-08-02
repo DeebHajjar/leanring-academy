@@ -295,8 +295,6 @@ msgid "Price (high to low)"
 msgstr "السعر (من الأعلى إلى الأدنى)"
 
 #: .\templates\courses\course_list.html:26
-#, fuzzy
-#| msgid "Student"
 msgid "Students"
 msgstr "الطالب"
 

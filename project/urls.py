@@ -14,6 +14,7 @@ urlpatterns += i18n_patterns(
     path('accounts/', include('allauth.urls')),
     path('accounts/', include('accounts.urls')),
     path('courses/', include('courses.urls')),
+    path('payments/', include(('payments.urls', 'payments'), namespace='payments')),
     prefix_default_language=False
 )
 

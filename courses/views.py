@@ -10,6 +10,7 @@ from django.db.models import Avg
 from django.db.models import Q
 from .forms import ReviewForm, CommentForm, CourseSearchForm
 from django.shortcuts import redirect
+from django.conf import settings
 
 
 def course_list(request):
@@ -69,10 +70,31 @@ def course_detail(request, slug):
     course = Course.objects.get(slug=slug)
     lessons = course.lessons.all()
     reviews = course.reviews.select_related('student').order_by('-created_at')[:10]
+    
+    # التحقق من ملكية المستخدم للدورة
+    user_owns_course = False
+    if request.user.is_authenticated:
+        # التحقق من وجود enrollment للمستخدم في الدورة
+        user_owns_course = Enrollment.objects.filter(
+            student=request.user,
+            course=course
+        ).exists()
+        
+        # إذا لم يجد enrollment، تحقق من وجود طلب مكتمل (fallback)
+        if not user_owns_course:
+            from payments.models import Order
+            user_owns_course = Order.objects.filter(
+                user=request.user,
+                course=course,
+                status='completed'
+            ).exists()
+    
     context = {
         'course': course,
         'lessons': lessons,
-        'reviews': reviews
+        'reviews': reviews,
+        'user_owns_course': user_owns_course,
+        'STRIPE_PUBLIC_KEY': settings.STRIPE_PUBLIC_KEY,
     }
     return render(
         request,
@@ -317,11 +339,8 @@ def instructor_detail(request, instructor_username):
     instructor.save()
     
     context = {
-
-
         'instructor': instructor,
         'courses': courses,
     }
     
     return render(request, 'courses/instructor_detail.html', context)
-

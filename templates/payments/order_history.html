@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Order History" %}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4">{% trans "Your Order History" %}</h2>
+            
+            {% if orders %}
+                <div class="card shadow">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>{% trans "Order ID" %}</th>
+                                        <th>{% trans "Course" %}</th>
+                                        <th>{% trans "Amount" %}</th>
+                                        <th>{% trans "Status" %}</th>
+                                        <th>{% trans "Date" %}</th>
+                                        <th>{% trans "Actions" %}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for order in orders %}
+                                    <tr>
+                                        <td>
+                                            <small class="text-muted">{{ order.order_id|truncatechars:15 }}</small>
+                                        </td>
+                                        <td>
+                                            <strong>{{ order.course.title }}</strong>
+                                            <br>
+                                            <small class="text-muted">{{ order.course.instructor.user.get_full_name }}</small>
+                                        </td>
+                                        <td>
+                                            <strong>${{ order.amount }}</strong>
+                                            <br>
+                                            <small class="text-muted">{{ order.currency }}</small>
+                                        </td>
+                                        <td>
+                                            {% if order.status == 'completed' %}
+                                                <span class="badge bg-success">{% trans "Completed" %}</span>
+                                            {% elif order.status == 'pending' %}
+                                                <span class="badge bg-warning">{% trans "Pending" %}</span>
+                                            {% elif order.status == 'failed' %}
+                                                <span class="badge bg-danger">{% trans "Failed" %}</span>
+                                            {% elif order.status == 'cancelled' %}
+                                                <span class="badge bg-secondary">{% trans "Cancelled" %}</span>
+                                            {% elif order.status == 'refunded' %}
+                                                <span class="badge bg-info">{% trans "Refunded" %}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {{ order.created_at|date:"M d, Y" }}
+                                            <br>
+                                            <small class="text-muted">{{ order.created_at|time:"H:i" }}</small>
+                                        </td>
+                                        <td>
+                                            {% if order.status == 'completed' %}
+                                                <a href="{% url 'courses:course_detail' order.course.slug %}" 
+                                                   class="btn btn-sm btn-primary">
+                                                    <i class="fas fa-play me-1"></i>{% trans "Access Course" %}
+                                                </a>
+                                            {% elif order.status == 'pending' %}
+                                                <button class="btn btn-sm btn-outline-warning" disabled>
+                                                    <i class="fas fa-clock me-1"></i>{% trans "Processing" %}
+                                                </button>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pagination -->
+                {% if is_paginated %}
+                <nav aria-label="{% trans 'Order history pagination' %}" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1">{% trans "First" %}</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">{% trans "Previous" %}</a>
+                            </li>
+                        {% endif %}
+                        
+                        <li class="page-item active">
+                            <span class="page-link">
+                                {% trans "Page" %} {{ page_obj.number }} {% trans "of" %} {{ page_obj.paginator.num_pages }}
+                            </span>
+                        </li>
+                        
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}">{% trans "Next" %}</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">{% trans "Last" %}</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+                
+            {% else %}
+                <div class="card shadow">
+                    <div class="card-body text-center p-5">
+                        <i class="fas fa-shopping-cart text-muted mb-3" style="font-size: 3rem;"></i>
+                        <h4 class="text-muted">{% trans "No Orders Yet" %}</h4>
+                        <p class="text-muted mb-4">
+                            {% trans "You haven't made any purchases yet. Browse our courses to get started!" %}
+                        </p>
+                        <a href="{% url 'courses:course_list' %}" class="btn btn-primary">
+                            <i class="fas fa-book me-2"></i>{% trans "Browse Courses" %}
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
