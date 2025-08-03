@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}
+    {% if object %}
+        {% trans "Edit Article" %} - {{ object.title }}
+    {% else %}
+        {% trans "Write New Article" %}
+    {% endif %}
+    - {% trans "Blog" %} - {{ block.super }}
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0">
+                        {% if object %}
+                            <i class="fas fa-edit"></i> {% trans "Edit Article" %}
+                        {% else %}
+                            <i class="fas fa-plus"></i> {% trans "Write New Article" %}
+                        {% endif %}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <!-- Title -->
+                        <div class="mb-3">
+                            <label for="{{ form.title.id_for_label }}" class="form-label">
+                                <strong>{% trans "Title" %}</strong>
+                            </label>
+                            {{ form.title }}
+                            {% if form.title.errors %}
+                                <div class="text-danger small">{{ form.title.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="row">
+                            <!-- Category -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.category.id_for_label }}" class="form-label">
+                                    <strong>{% trans "Category" %}</strong>
+                                </label>
+                                {{ form.category }}
+                                {% if form.category.errors %}
+                                    <div class="text-danger small">{{ form.category.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Status -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.status.id_for_label }}" class="form-label">
+                                    <strong>{% trans "Status" %}</strong>
+                                </label>
+                                {{ form.status }}
+                                {% if form.status.errors %}
+                                    <div class="text-danger small">{{ form.status.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Tags -->
+                        <div class="mb-3">
+                            <label for="{{ form.tags.id_for_label }}" class="form-label">
+                                <strong>{% trans "Tags" %}</strong>
+                            </label>
+                            {{ form.tags }}
+                            <small class="form-text text-muted">
+                                {% trans "Hold Ctrl/Cmd to select multiple tags" %}
+                            </small>
+                            {% if form.tags.errors %}
+                                <div class="text-danger small">{{ form.tags.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Excerpt -->
+                        <div class="mb-3">
+                            <label for="{{ form.excerpt.id_for_label }}" class="form-label">
+                                <strong>{% trans "Excerpt" %}</strong>
+                            </label>
+                            {{ form.excerpt }}
+                            <small class="form-text text-muted">
+                                {% trans "Brief description of the article (max 300 characters)" %}
+                            </small>
+                            {% if form.excerpt.errors %}
+                                <div class="text-danger small">{{ form.excerpt.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Featured Image -->
+                        <div class="mb-3">
+                            <label for="{{ form.featured_image.id_for_label }}" class="form-label">
+                                <strong>{% trans "Featured Image" %}</strong>
+                            </label>
+                            {{ form.featured_image }}
+                            {% if object.featured_image %}
+                                <div class="mt-2">
+                                    <img src="{{ object.featured_image.url }}" alt="{{ object.title }}" 
+                                         class="img-thumbnail" style="max-width: 200px;">
+                                    <small class="d-block text-muted">{% trans "Current image" %}</small>
+                                </div>
+                            {% endif %}
+                            {% if form.featured_image.errors %}
+                                <div class="text-danger small">{{ form.featured_image.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Content -->
+                        <div class="mb-3">
+                            <label for="{{ form.content.id_for_label }}" class="form-label">
+                                <strong>{% trans "Content" %}</strong>
+                            </label>
+                            {{ form.content }}
+                            {% if form.content.errors %}
+                                <div class="text-danger small">{{ form.content.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Featured checkbox (only for superusers) -->
+                        {% if request.user.is_superuser %}
+                        <div class="mb-3">
+                            <div class="form-check">
+                                {{ form.is_featured }}
+                                <label class="form-check-label" for="{{ form.is_featured.id_for_label }}">
+                                    {% trans "Mark as featured article" %}
+                                </label>
+                            </div>
+                            {% if form.is_featured.errors %}
+                                <div class="text-danger small">{{ form.is_featured.errors }}</div>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+
+                        <!-- Buttons -->
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'blog:my_articles' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> {% trans "Back to My Articles" %}
+                            </a>
+                            <div>
+                                <button type="submit" name="status" value="draft" class="btn btn-outline-primary me-2">
+                                    <i class="fas fa-save"></i> {% trans "Save as Draft" %}
+                                </button>
+                                <button type="submit" name="status" value="published" class="btn btn-primary">
+                                    <i class="fas fa-paper-plane"></i> {% trans "Publish" %}
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Auto-resize textarea
+document.addEventListener('DOMContentLoaded', function() {
+    const textarea = document.querySelector('#id_content');
+    if (textarea) {
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = this.scrollHeight + 'px';
+        });
+        // Initial resize
+        textarea.style.height = textarea.scrollHeight + 'px';
+    }
+});
+</script>
+{% endblock %}

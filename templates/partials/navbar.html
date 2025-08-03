@@ -29,10 +29,25 @@
             <li class="nav-item">
                 <a class="nav-link" href="{% url 'courses:my_courses' %}">{% trans 'My Courses' %}</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'blog:article_list' %}">{% trans 'Blog' %}</a>
+            </li>
             <!-- Admin -->
             {% if request.user.is_superuser %}
             <li class="nav-item">
                 <a class="nav-link" href="{% url 'admin:index' %}">{% trans 'Admin' %}</a>
+            </li>
+            {% endif %}
+            <!-- Instructor/Admin Blog Management -->
+            {% if request.user.is_authenticated and request.user.is_superuser or request.user.is_staff or request.user.user_type == 'instructor' %}
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                    {% trans 'Blog Management' %}
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="{% url 'blog:my_articles' %}">{% trans 'My Articles' %}</a></li>
+                    <li><a class="dropdown-item" href="{% url 'blog:article_create' %}">{% trans 'Write Article' %}</a></li>
+                </ul>
             </li>
             {% endif %}
         </ul>

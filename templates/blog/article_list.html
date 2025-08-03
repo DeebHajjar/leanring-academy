@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Blog" %} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="bg-primary text-white p-4 rounded">
+                <h1 class="display-5 mb-0">{% trans "Blog" %}</h1>
+                <p class="lead mb-0">{% trans "Discover articles and insights from our instructors" %}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <!-- Search Form -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="get" action="{% url 'blog:search_articles' %}">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                {{ search_form.query }}
+                            </div>
+                            <div class="col-md-3">
+                                {{ search_form.category }}
+                            </div>
+                            <div class="col-md-3">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-search"></i> {% trans "Search" %}
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Featured Articles -->
+            {% if featured_articles %}
+            <div class="mb-4">
+                <h3 class="mb-3">{% trans "Featured Articles" %}</h3>
+                <div class="row">
+                    {% for article in featured_articles %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            {% if article.featured_image %}
+                            <a href="{{ article.get_absolute_url }}">
+                                <img src="{{ article.featured_image.url }}" class="card-img-top" alt="{{ article.title }}" style="height: 200px; object-fit: cover;">
+                            </a>
+                            {% endif %}
+                            <div class="card-body">
+                                <span class="badge bg-warning text-dark mb-2">{% trans "Featured" %}</span>
+                                <h6 class="card-title">
+                                    <a href="{{ article.get_absolute_url }}" class="text-decoration-none">{{ article.title }}</a>
+                                </h6>
+                                <p class="card-text small text-muted">{{ article.excerpt|truncatewords:15 }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Articles List -->
+            <div class="row">
+                {% for article in articles %}
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        {% if article.featured_image %}
+                        <a href="{{ article.get_absolute_url }}">
+                            <img src="{{ article.featured_image.url }}" class="card-img-top" alt="{{ article.title }}" style="height: 200px; object-fit: cover;">
+                        </a>
+                        {% endif %}
+                        <div class="card-body">
+                            {% if article.is_featured %}
+                            <span class="badge bg-warning text-dark mb-2">{% trans "Featured" %}</span>
+                            {% endif %}
+                            {% if article.category %}
+                            <a href="{% url 'blog:category_articles' article.category.slug %}" class="badge bg-secondary text-decoration-none mb-2">
+                                {{ article.category.name }}
+                            </a>
+                            {% endif %}
+                            <h5 class="card-title">
+                                <a href="{{ article.get_absolute_url }}" class="text-decoration-none">{{ article.title }}</a>
+                            </h5>
+                            <p class="card-text">{{ article.excerpt }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">
+                                    {% trans "By" %} {{ article.author.get_full_name }}
+                                </small>
+                                <small class="text-muted">
+                                    <i class="fas fa-eye"></i> {{ article.views_count }}
+                                </small>
+                            </div>
+                            <small class="text-muted">{{ article.published_at|date:"M d, Y" }}</small>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <div class="text-center py-5">
+                        <i class="fas fa-newspaper fa-3x text-muted mb-3"></i>
+                        <h4 class="text-muted">{% trans "No articles found" %}</h4>
+                        <p class="text-muted">{% trans "Check back later for new content!" %}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if is_paginated %}
+            <nav aria-label="{% trans 'Articles pagination' %}">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1">{% trans "First" %}</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">{% trans "Previous" %}</a>
+                    </li>
+                    {% endif %}
+                    
+                    <li class="page-item active">
+                        <span class="page-link">{{ page_obj.number }} {% trans "of" %} {{ page_obj.paginator.num_pages }}</span>
+                    </li>
+                    
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">{% trans "Next" %}</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">{% trans "Last" %}</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Categories -->
+            {% if categories %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">{% trans "Categories" %}</h5>
+                </div>
+                <div class="card-body">
+                    {% for category in categories %}
+                    <a href="{% url 'blog:category_articles' category.slug %}" class="btn btn-outline-secondary btn-sm me-2 mb-2">
+                        {{ category.name }}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Popular Tags -->
+            {% if popular_tags %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">{% trans "Popular Tags" %}</h5>
+                </div>
+                <div class="card-body">
+                    {% for tag in popular_tags %}
+                    <a href="{% url 'blog:tag_articles' tag.slug %}" class="btn btn-outline-info btn-sm me-1 mb-2">
+                        #{{ tag.name }}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

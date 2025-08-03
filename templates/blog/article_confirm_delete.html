@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Delete Article" %} - {{ object.title }} - {% trans "Blog" %} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-exclamation-triangle"></i> {% trans "Delete Article" %}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-warning"></i>
+                        <strong>{% trans "Warning!" %}</strong>
+                        {% trans "This action cannot be undone." %}
+                    </div>
+                    
+                    <p>{% trans "Are you sure you want to delete the following article?" %}</p>
+                    
+                    <div class="card mb-3">
+                        {% if object.featured_image %}
+                        <img src="{{ object.featured_image.url }}" class="card-img-top" alt="{{ object.title }}" style="max-height: 200px; object-fit: cover;">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ object.title }}</h5>
+                            <p class="card-text">{{ object.excerpt }}</p>
+                            <div class="d-flex justify-content-between">
+                                <small class="text-muted">
+                                    {% trans "Created" %}: {{ object.created_at|date:"M d, Y" }}
+                                </small>
+                                <small class="text-muted">
+                                    <i class="fas fa-eye"></i> {{ object.views_count }} {% trans "views" %}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'blog:my_articles' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> {% trans "Cancel" %}
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> {% trans "Yes, Delete Article" %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

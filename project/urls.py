@@ -15,6 +15,7 @@ urlpatterns += i18n_patterns(
     path('accounts/', include('accounts.urls')),
     path('courses/', include('courses.urls')),
     path('payments/', include(('payments.urls', 'payments'), namespace='payments')),
+    path('blog/', include(('blog.urls', 'blog'), namespace='blog')),
     prefix_default_language=False
 )
 
