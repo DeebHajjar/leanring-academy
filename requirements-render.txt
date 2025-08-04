@@ -1,0 +1,57 @@
+# Core Django
+Django==5.2.4
+asgiref==3.9.1
+sqlparse==0.5.3
+tzdata==2025.2
+typing_extensions==4.14.1
+
+# Database - Render optimized
+psycopg2-binary==2.9.9
+dj-database-url==2.1.0
+
+# Production Server
+gunicorn==21.2.0
+whitenoise==6.6.0
+
+# Configuration
+python-decouple==3.8
+
+# Forms and UI
+django-crispy-forms==2.4
+crispy-bootstrap5==2025.6
+
+# Internationalization
+django-modeltranslation==0.19.16
+
+# Authentication
+django-allauth==65.10.0
+PyJWT==2.10.1
+oauthlib==3.3.1
+requests-oauthlib==2.0.0
+
+# AWS S3 Storage
+boto3==1.35.84
+botocore==1.35.99
+django-storages==1.14.4
+jmespath==1.0.1
+python-dateutil==2.9.0.post0
+s3transfer==0.10.4
+six==1.17.0
+
+# Payment Processing
+stripe==12.3.0
+
+# Image Processing
+pillow==11.3.0
+
+# HTTP Requests
+requests==2.32.4
+urllib3==2.5.0
+certifi==2025.7.14
+charset-normalizer==3.4.2
+idna==3.10
+
+# Cryptography
+cryptography==45.0.5
+cffi==1.17.1
+pycparser==2.22
