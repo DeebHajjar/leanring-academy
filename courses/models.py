@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from accounts.models import User
+from storages.backends.s3boto3 import S3Boto3Storage
 
 
 class Instructor(models.Model):
@@ -42,8 +43,8 @@ class Course(models.Model):
     
     instructor = models.ForeignKey(Instructor, on_delete=models.CASCADE)
     
-    thumbnail = models.ImageField(upload_to='courses/thumbnails/')
-    video_preview = models.FileField(upload_to='courses/previews/', blank=True)
+    thumbnail = models.ImageField(upload_to='courses/thumbnails/', storage=S3Boto3Storage())
+    video_preview = models.FileField(upload_to='courses/previews/', storage=S3Boto3Storage(), blank=True)
     
     price = models.DecimalField(max_digits=10, decimal_places=2)
     discount_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
@@ -88,7 +89,7 @@ class Lesson(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     
-    video_file = models.FileField(upload_to='courses/videos/')
+    video_file = models.FileField(upload_to='courses/videos/', storage=S3Boto3Storage())
     duration_minutes = models.PositiveIntegerField()
     order = models.PositiveIntegerField(default=0)
     

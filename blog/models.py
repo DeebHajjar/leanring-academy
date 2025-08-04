@@ -4,6 +4,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import slugify
 from accounts.models import User
+from storages.backends.s3boto3 import S3Boto3Storage
 
 
 class Category(models.Model):
@@ -97,7 +98,7 @@ class Article(models.Model):
     
     excerpt = models.CharField(max_length=300, help_text=_('Brief description of the article'))
     content = models.TextField()
-    featured_image = models.ImageField(upload_to='blog/images/', blank=True, null=True)
+    featured_image = models.ImageField(upload_to='articles/images/', storage=S3Boto3Storage(), blank=True, null=True)
     
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft')
     is_featured = models.BooleanField(default=False)
