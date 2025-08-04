@@ -5,85 +5,222 @@
 {% block title %}{% trans lesson.title %}{% endblock %}
 
 {% block content %}
+    <!-- Breadcrumb -->
+    <div class="bg-light py-3">
+        <div class="container">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-decoration-none">{% trans "Home" %}</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'courses:course_list' %}" class="text-decoration-none">{% trans "Courses" %}</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'courses:course_detail' course.slug %}" class="text-decoration-none">{{ course.title }}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ lesson.title }}</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+    
     <div class="container py-5">
-        <div class="row">
-            <div class="col-md-8">
-                <video id="lesson-video" src="{{ lesson.video_file.url }}" autoplay controls class="w-100"></video>
-            </div>
-            <div class="col-md-4">
-                <h2>{{ lesson.title }}</h2>
-                <p>{{ lesson.description }}</p>
-                <p>{{ lesson.duration_minutes }}</p>
-            </div>
-            <!-- next - previous buttons -->
-            <div class="col-md-4">
-                {% if previous_lesson %}
-                    <a href="{% url 'courses:lesson_detail' course.slug previous_lesson.id %}" class="btn btn-primary">{% trans "<" %}</a>
-                {% endif %}
-                {% if next_lesson %}
-                    <a href="{% url 'courses:lesson_detail' course.slug next_lesson.id %}" class="btn btn-primary">{% trans ">" %}</a>
-                {% endif %}
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-8">
-                <h2>{% trans 'Add Comment' %}</h2>
-                <form method="post" action="{% url 'courses:add_comment' lesson.id %}">
-                    {% csrf_token %}
-                    <input type="hidden" name="lesson_id" value="{{ lesson.id }}">
-                    <textarea name="content" class="form-control" rows="3" placeholder="{% trans 'Write your comment...' %}"></textarea>
-                    <button type="submit" class="btn btn-primary">{% trans 'Add Comment' %}</button>
-                </form>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-8">
-                <h2>{% trans 'Comments' %}</h2>
-                {% for comment in comments %}
-                    <div class="card mb-3">
-                        <div class="card-header">
-                            <strong>{{ comment.user.get_full_name }}</strong>
+        <div class="row g-4">
+            <!-- Video Player Section -->
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-lg mb-4">
+                    <div class="card-body p-0">
+                        <div class="position-relative">
+                            {% if lesson.video_file %}
+                                <video id="lesson-video" class="w-100 rounded-top" style="max-height: 500px; object-fit: cover;" controls poster="{{ lesson.thumbnail.url }}">
+                                    <source src="{{ lesson.video_file.url }}" type="video/mp4">
+                                    {% trans "Your browser does not support the video tag." %}
+                                </video>
+                            {% else %}
+                                <div class="bg-secondary d-flex align-items-center justify-content-center rounded-top" style="height: 400px;">
+                                    <div class="text-center text-white">
+                                        <i class="fas fa-video fa-4x mb-3"></i>
+                                        <p class="mb-0">{% trans "Video not available" %}</p>
+                                    </div>
+                                </div>
+                            {% endif %}
                         </div>
-                        <div class="card-body">
-                            <p>{{ comment.content }}</p>
-                            <small>{{ comment.created_at }}</small>
-                            <!-- Reply Button -->
-                            <button class="btn btn-link btn-sm" type="button" onclick="toggleReplyForm({{ comment.id }})">{% trans "Reply" %}</button>
-                            <!-- Reply Form -->
-                            <form method="post" action="{% url 'courses:add_comment' lesson.id %}" class="reply-form mt-2" id="reply-form-{{ comment.id }}" style="display:none;">
-                                {% csrf_token %}
-                                <input type="hidden" name="parent_id" value="{{ comment.id }}">
-                                <textarea name="content" class="form-control mb-2" rows="2" placeholder="{% trans 'Write your reply...' %}"></textarea>
-                                <button type="submit" class="btn btn-primary btn-sm">{% trans "Add Reply" %}</button>
-                            </form>
-                            {% if comment.children.exists %}
-                                <div class="ms-4">
-                                    {% for child in comment.children.all|dictsort:"created_at" %}
-                                        <div class="card mb-2">
-                                            <div class="card-header">
-                                                <strong>{{ child.user.get_full_name }}</strong>
-                                            </div>
-                                            <div class="card-body">
-                                                <p>{{ child.content }}</p>
-                                                <small>{{ child.created_at }}</small>
-                                                <!-- Reply Button on Reply -->
-                                                <button class="btn btn-link btn-sm" type="button" onclick="toggleReplyForm({{ child.id }})">{% trans "Reply" %}</button>
-                                                <form method="post" action="{% url 'courses:add_comment' lesson.id %}" class="reply-form mt-2" id="reply-form-{{ child.id }}" style="display:none;">
-                                                    {% csrf_token %}
-                                                    <input type="hidden" name="parent_id" value="{{ child.id }}">
-                                                    <textarea name="content" class="form-control mb-2" rows="2" placeholder="{% trans 'Write your reply...' %}"></textarea>
-                                                    <button type="submit" class="btn btn-primary btn-sm">{% trans "Add Reply" %}</button>
-                                                </form>
-                                                {% if child.children.exists %}
-                                                    <div class="ms-4">
-                                                        {% for grandchild in child.children.all|dictsort:"created_at" %}
-                                                            <div class="card mb-2">
-                                                                <div class="card-header">
-                                                                    <strong>{{ grandchild.user.get_full_name }}</strong>
-                                                                </div>
-                                                                <div class="card-body">
-                                                                    <p>{{ grandchild.content }}</p>
-                                                                    <small>{{ grandchild.created_at }}</small>
+                        
+                        <!-- Lesson Info -->
+                        <div class="p-4">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div class="flex-grow-1">
+                                    <h1 class="h3 fw-bold mb-2">{{ lesson.title }}</h1>
+                                    <div class="d-flex align-items-center gap-3 text-muted">
+                                        {% if lesson.duration_minutes %}
+                                            <span>
+                                                <i class="fas fa-clock me-1"></i>
+                                                {{ lesson.duration_minutes }} {% trans "minutes" %}
+                                            </span>
+                                        {% endif %}
+                                        <span>
+                                            <i class="fas fa-eye me-1"></i>
+                                            {{ lesson.views|default:0 }} {% trans "views" %}
+                                        </span>
+                                        {% if lesson.is_free %}
+                                            <span class="badge bg-success">{% trans "Free" %}</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <!-- Navigation Buttons -->
+                                <div class="d-flex gap-2">
+                                    {% if previous_lesson %}
+                                        <a href="{% url 'courses:lesson_detail' course.slug previous_lesson.id %}" class="btn btn-outline-primary" title="{% trans 'Previous Lesson' %}">
+                                            <i class="fas fa-chevron-left"></i>
+                                        </a>
+                                    {% endif %}
+                                    {% if next_lesson %}
+                                        <a href="{% url 'courses:lesson_detail' course.slug next_lesson.id %}" class="btn btn-primary" title="{% trans 'Next Lesson' %}">
+                                            <i class="fas fa-chevron-right"></i>
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            {% if lesson.description %}
+                                <div class="text-muted lh-lg">
+                                    {{ lesson.description|linebreaks }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            
+            <div class="col-lg-4">
+                <!-- Course Progress -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3">
+                            <i class="fas fa-chart-line text-success me-2"></i>
+                            {% trans "Course Progress" %}
+                        </h5>
+                        <div class="progress mb-3" style="height: 10px;">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ course_progress|default:0 }}%"></div>
+                        </div>
+                        <div class="d-flex justify-content-between text-muted small">
+                            <span>{{ completed_lessons|default:0 }}/{{ total_lessons|default:0 }} {% trans "lessons" %}</span>
+                            <span>{{ course_progress|default:0 }}%</span>
+                        </div>
+                        <a href="{% url 'courses:my_lessons' course.slug %}" class="btn btn-outline-primary btn-sm mt-3 w-100">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            {% trans "Back to Course" %}
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <!-- Comments Section -->
+            <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-0 p-4">
+                        <h3 class="fw-bold mb-0">
+                            <i class="fas fa-comments text-primary me-2"></i>
+                            {% trans "Discussion" %}
+                        </h3>
+                        <p class="text-muted mb-0 mt-2">{{ comments.count }} {% trans "comments" %}</p>
+                    </div>
+                    <div class="card-body p-4">
+                        {% if user.is_authenticated %}
+                            <div class="mb-4">
+                                <h5 class="fw-semibold mb-3">
+                                    <i class="fas fa-plus-circle text-success me-2"></i>
+                                    {% trans "Add Comment" %}
+                                </h5>
+                                <form method="post" action="{% url 'courses:add_comment' lesson.id %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="lesson_id" value="{{ lesson.id }}">
+                                    <div class="mb-3">
+                                        <textarea name="content" class="form-control" rows="3" placeholder="{% trans 'Share your thoughts about this lesson...' %}" required></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-paper-plane me-2"></i>
+                                        {% trans "Post Comment" %}
+                                    </button>
+                                </form>
+                            </div>
+                            <hr class="my-4">
+                        {% else %}
+                            <div class="alert alert-info mb-4">
+                                <i class="fas fa-info-circle me-2"></i>
+                                {% trans "Please" %} <a href="{% url 'account_login' %}" class="alert-link">{% trans "login" %}</a> {% trans "to join the discussion." %}
+                            </div>
+                        {% endif %}
+                        
+                        <!-- Comments List -->
+                        {% if comments %}
+                            <div class="comments-list">
+                                {% for comment in comments %}
+                                    <div class="comment-item mb-4 pb-4 border-bottom">
+                                        <div class="d-flex align-items-start">
+                                            {% if comment.user.avatar %}
+                                                <img src="{{ comment.user.avatar.url }}" class="rounded-circle me-3" style="width: 45px; height: 45px; object-fit: cover;" alt="{{ comment.user.get_full_name }}">
+                                            {% else %}
+                                            {% if comment.user.profile_picture_url %}
+                                                <img src="{{ comment.user.profile_picture_url }}" class="rounded-circle me-3" style="width: 45px; height: 45px; object-fit: cover;" alt="{{ comment.user.get_full_name }}">
+                                            {% else %}
+                                                <div class="bg-primary rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+                                                    <i class="fas fa-user text-white"></i>
+                                                </div>
+                                            {% endif %}
+                                            {% endif %}
+                                            <div class="flex-grow-1">
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <h6 class="fw-semibold mb-0 me-2">{{ comment.user.get_full_name|default:comment.user.username }}</h6>
+                                                    <small class="text-muted">{{ comment.created_at|timesince }} {% trans "ago" %}</small>
+                                                </div>
+                                                <p class="text-muted mb-3">{{ comment.content|linebreaks }}</p>
+                                                
+                                                {% if user.is_authenticated %}
+                                                    <button class="btn btn-sm btn-outline-primary reply-btn" data-comment-id="{{ comment.id }}">
+                                                        <i class="fas fa-reply me-1"></i>
+                                                        {% trans "Reply" %}
+                                                    </button>
+                                                {% endif %}
+                                                
+                                                <!-- Reply Form (hidden by default) -->
+                                                <div class="reply-form mt-3" id="reply-form-{{ comment.id }}" style="display: none;">
+                                                    <form method="post" action="{% url 'courses:add_reply' comment.id %}">
+                                                        {% csrf_token %}
+                                                        <div class="mb-2">
+                                                            <textarea name="content" class="form-control" rows="2" placeholder="{% trans 'Write your reply...' %}" required></textarea>
+                                                        </div>
+                                                        <div class="d-flex gap-2">
+                                                            <button type="submit" class="btn btn-sm btn-primary">
+                                                                <i class="fas fa-paper-plane me-1"></i>
+                                                                {% trans "Reply" %}
+                                                            </button>
+                                                            <button type="button" class="btn btn-sm btn-outline-secondary cancel-reply">
+                                                                {% trans "Cancel" %}
+                                                            </button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                                
+                                                <!-- Display Replies -->
+                                                {% if comment.children.all %}
+                                                    <div class="replies mt-3">
+                                                        {% for reply in comment.children.all %}
+                                                            <div class="ms-4 mt-3 border-start border-2 border-primary ps-3">
+                                                                <div class="d-flex align-items-start">
+                                                                    {% if reply.user.avatar %}
+                                                                        <img src="{{ reply.user.avatar.url }}" class="rounded-circle me-2" style="width: 35px; height: 35px; object-fit: cover;" alt="{{ reply.user.get_full_name }}">
+                                                                    {% else %}
+                                                                    {% if reply.user.profile_picture_url %}
+                                                                        <img src="{{ reply.user.profile_picture_url }}" class="rounded-circle me-2" style="width: 35px; height: 35px; object-fit: cover;" alt="{{ reply.user.get_full_name }}">
+                                                                    {% else %}
+                                                                        <div class="bg-secondary rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;">
+                                                                            <i class="fas fa-user text-white small"></i>
+                                                                        </div>
+                                                                    {% endif %}
+                                                                    {% endif %}
+                                                                    <div class="flex-grow-1">
+                                                                        <div class="d-flex align-items-center mb-1">
+                                                                            <h6 class="fw-semibold mb-0 me-2 small">{{ reply.user.get_full_name|default:reply.user.username }}</h6>
+                                                                            <small class="text-muted">{{ reply.created_at|timesince }} {% trans "ago" %}</small>
+                                                                        </div>
+                                                                        <p class="text-muted mb-0 small">{{ reply.content|linebreaks }}</p>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         {% endfor %}
@@ -91,13 +228,17 @@
                                                 {% endif %}
                                             </div>
                                         </div>
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="text-center py-5">
+                                <i class="fas fa-comments fa-3x text-muted mb-3"></i>
+                                <p class="text-muted">{% trans "No comments yet. Be the first to start the discussion!" %}</p>
+                            </div>
+                        {% endif %}
                     </div>
-                {% endfor %}
-            </div>
+                </div>
         </div>
     </div>
     <script>
@@ -134,6 +275,50 @@
                     }
                 });
             }
+        });
+    </script>
+    
+    <!-- Reply Forms JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle reply button clicks
+            const replyButtons = document.querySelectorAll('.reply-btn');
+            const cancelButtons = document.querySelectorAll('.cancel-reply');
+            
+            replyButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const commentId = this.getAttribute('data-comment-id');
+                    const replyForm = document.getElementById('reply-form-' + commentId);
+                    
+                    // Hide all other reply forms
+                    document.querySelectorAll('.reply-form').forEach(form => {
+                        form.style.display = 'none';
+                    });
+                    
+                    // Show this reply form
+                    if (replyForm) {
+                        replyForm.style.display = 'block';
+                        const textarea = replyForm.querySelector('textarea');
+                        if (textarea) {
+                            textarea.focus();
+                        }
+                    }
+                });
+            });
+            
+            // Handle cancel button clicks
+            cancelButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const replyForm = this.closest('.reply-form');
+                    if (replyForm) {
+                        replyForm.style.display = 'none';
+                        const textarea = replyForm.querySelector('textarea');
+                        if (textarea) {
+                            textarea.value = '';
+                        }
+                    }
+                });
+            });
         });
     </script>
 {% endblock %}

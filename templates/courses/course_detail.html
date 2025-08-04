@@ -10,105 +10,415 @@
 {% endblock %}
 
 {% block content %}
-    <div class="container py-5">
-        <div class="row">
-            <div class="col-md-8">
-                <video src="{{ course.video_preview.url }}" autoplay controls class="w-100"></video>
-            </div>
-            <div class="col-md-4">
-                <h2>{{ course.title }}</h2>
-                <p>{{ course.description }}</p>
-                <p>{{ course.price }}</p>
-                <p>{{ course.difficulty }}</p>
-                <p>{{ course.duration_hours }}</p>
-                <p>{{ course.language }}</p>
-                <p>{{ course.requirements }}</p>
-                <p>{{ course.what_you_learn }}</p>
-                <p>By:
-                    <a href="{% url 'courses:instructor_detail' course.instructor.user.username %}">
-                        {{ course.instructor.user.get_full_name }}
-                    </a>
-                </p>
-            </div>
-            <div class="col-md-8">
-                <h2>{% trans "Lessons" %}</h2>
-                <ul>
-                    {% if lessons %}
-                    {% for lesson in lessons %}
-                    {% if lesson.is_free %}
-                        <li><a href="{% url 'courses:lesson_detail' course.slug lesson.id %}">{{ lesson.title }}</a></li>
-                    {% else %}
-                        <li>{{ lesson.title }} <span class="badge bg-primary">{% trans "Paid" %}</span></li>
-                    {% endif %}
-                    {% endfor %}
-                    {% else %}
-                    <p>{% trans "No lessons available." %}</p>
-                    {% endif %}
-                </ul>
-            </div>
-            <div class="col-md-4">
-                {% if user.is_authenticated %}
-                    {% if user_owns_course %}
-                        <a href="{% url 'courses:course_detail' course.slug %}" class="btn btn-success btn-lg w-100">
-                            <i class="fas fa-play me-2"></i>{% trans "Continue Learning" %}
-                        </a>
-                    {% else %}
-                        <div class="card border-primary">
-                            <div class="card-body text-center">
-                                <h4 class="text-primary">${{ course.price }}</h4>
-                                <button id="checkout-button" class="btn btn-primary btn-lg w-100" type="button">
-                                    <i class="fas fa-shopping-cart me-2"></i>{% trans "Buy Now" %}
-                                </button>
-                                <small class="text-muted d-block mt-2">
-                                    {% trans "30-day money-back guarantee" %}
-                                </small>
+    <!-- Hero Section -->
+    <div class="bg-primary text-white py-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb text-white-50">
+                            <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-white-50">{% trans "Home" %}</a></li>
+                            <li class="breadcrumb-item"><a href="{% url 'courses:course_list' %}" class="text-white-50">{% trans "Courses" %}</a></li>
+                            <li class="breadcrumb-item active text-white" aria-current="page">{{ course.title }}</li>
+                        </ol>
+                    </nav>
+                    <h1 class="display-5 fw-bold mb-3">{{ course.title }}</h1>
+                    <p class="lead mb-4">{{ course.description|truncatewords:30 }}</p>
+                    
+                    <!-- Course Meta Info -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-auto">
+                            <div class="d-flex align-items-center text-white-75">
+                                <i class="fas fa-star text-warning me-2"></i>
+                                <span class="fw-semibold">{{ course.rating|floatformat:1 }}</span>
+                                <span class="ms-1">({{ reviews.count }} {% trans "reviews" %})</span>
                             </div>
                         </div>
-                    {% endif %}
-                {% else %}
-                    <div class="card border-warning">
-                        <div class="card-body text-center">
-                            <h4 class="text-primary">${{ course.price }}</h4>
-                            <p class="text-muted">{% trans "Please login to purchase this course" %}</p>
-                            <a href="{% url 'account_login' %}" class="btn btn-warning btn-lg w-100">
-                                <i class="fas fa-sign-in-alt me-2"></i>{% trans "Login to Buy" %}
+                        <div class="col-auto">
+                            <div class="d-flex align-items-center text-white-75">
+                                <i class="fas fa-users me-2"></i>
+                                <span>{{ course.enrolled_students.count }} {% trans "students" %}</span>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="d-flex align-items-center text-white-75">
+                                <i class="fas fa-clock me-2"></i>
+                                <span>{{ course.duration_hours }} {% trans "hours" %}</span>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="d-flex align-items-center text-white-75">
+                                <i class="fas fa-signal me-2"></i>
+                                <span>{{ course.get_difficulty_display }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Instructor Info -->
+                    <div class="d-flex align-items-center">
+                        {% if course.instructor.user.avatar %}
+                            <img src="{{ course.instructor.user.avatar.url }}" class="rounded-circle me-3" style="width: 50px; height: 50px; object-fit: cover;" alt="{{ course.instructor.user.get_full_name }}">
+                        {% else %}
+                            <div class="bg-secondary rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                <i class="fas fa-user text-white"></i>
+                            </div>
+                        {% endif %}
+                        <div>
+                            <div class="text-white-75 small">{% trans "Created by" %}</div>
+                            <a href="{% url 'courses:instructor_detail' course.instructor.user.username %}" class="text-white fw-semibold text-decoration-none">
+                                {{ course.instructor.user.get_full_name }}
                             </a>
                         </div>
                     </div>
-                {% endif %}
+                </div>
+                <div class="col-lg-4 text-center">
+                    <div class="position-relative">
+                        {% if course.video_preview %}
+                            <video class="img-fluid rounded shadow-lg" style="max-height: 300px; width: 100%; object-fit: cover;" poster="{{ course.thumbnail.url }}" controls>
+                                <source src="{{ course.video_preview.url }}" type="video/mp4">
+                                {% trans "Your browser does not support the video tag." %}
+                            </video>
+                        {% elif course.thumbnail %}
+                            <img src="{{ course.thumbnail.url }}" class="img-fluid rounded shadow-lg" style="max-height: 300px; width: 100%; object-fit: cover;" alt="{{ course.title }}">
+                        {% else %}
+                            <div class="bg-secondary rounded d-flex align-items-center justify-content-center" style="height: 300px;">
+                                <i class="fas fa-play-circle fa-4x text-white-50"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
-            <div class="col-md-12">
-                <form method="post" action="{% url 'courses:add_review' course.slug %}">
-                    <h2>{% trans "Reviews" %}</h2>
-                    {% if reviews %}
-                    <p>Rating: {{ course.rating }} ⭐</p>
-                    <p>Total Reviews: {{ course.total_reviews }}</p>
-                    <ul>
-                        {% for review in reviews %}
-                            <li>{{ review.student.username }} - {{ review.rating }} ⭐ - {{ review.comment }}</li>
-                        {% endfor %}
-                    </ul>
-                    {% else %}
-                    <p>{% trans "No reviews yet." %}</p>
-                    {% endif %}
-                    <h2>{% trans "Add Review" %}</h2>
-                    {% csrf_token %}
-
-                    <div class="mb-3">
-                        <label for="rating">{% trans "Rating" %}</label>
-                        <select name="rating" id="rating" class="form-select">
-                            {% for i in "12345" %}
-                                <option value="{{ i }}">{{ i }} ⭐</option>
-                            {% endfor %}
-                        </select>
-
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="container py-5">
+        <div class="row g-5">
+            <!-- Course Content -->
+            <div class="col-lg-8">
+                <!-- Course Description -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <h3 class="fw-bold mb-3">
+                            <i class="fas fa-info-circle text-primary me-2"></i>
+                            {% trans "About This Course" %}
+                        </h3>
+                        <div class="text-muted lh-lg">{{ course.description|linebreaks }}</div>
                     </div>
-                    <div class="mb-3">
-                        <label for="comment">Comment</label>
-                        <textarea name="comment" id="comment" class="form-control"></textarea>
+                </div>
+                
+                <!-- What You'll Learn -->
+                {% if course.what_you_learn %}
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <h3 class="fw-bold mb-3">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            {% trans "What You'll Learn" %}
+                        </h3>
+                        <div class="text-muted lh-lg">{{ course.what_you_learn|linebreaks }}</div>
                     </div>
-                    <button type="submit" class="btn btn-primary">{% trans "Submit Review" %}</button>
-                </form>
+                </div>
+                {% endif %}
+                
+                <!-- Requirements -->
+                {% if course.requirements %}
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <h3 class="fw-bold mb-3">
+                            <i class="fas fa-list-ul text-warning me-2"></i>
+                            {% trans "Requirements" %}
+                        </h3>
+                        <div class="text-muted lh-lg">{{ course.requirements|linebreaks }}</div>
+                    </div>
+                </div>
+                {% endif %}
+                <!-- Course Curriculum -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white border-0 p-4">
+                        <h3 class="fw-bold mb-0">
+                            <i class="fas fa-list text-primary me-2"></i>
+                            {% trans "Course Content" %}
+                        </h3>
+                        {% if lessons %}
+                            <p class="text-muted mb-0 mt-2">{{ lessons.count }} {% trans "lessons" %} • {{ course.duration_hours }} {% trans "hours total" %}</p>
+                        {% endif %}
+                    </div>
+                    <div class="card-body p-0">
+                        {% if lessons %}
+                            <div class="list-group list-group-flush">
+                                {% for lesson in lessons %}
+                                    <div class="list-group-item border-0 py-3 px-4">
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <div class="d-flex align-items-center">
+                                                {% if lesson.is_free or user_owns_course %}
+                                                    <i class="fas fa-play-circle text-success me-3"></i>
+                                                {% else %}
+                                                    <i class="fas fa-lock text-muted me-3"></i>
+                                                {% endif %}
+                                                <div>
+                                                    {% if lesson.is_free or user_owns_course %}
+                                                        <a href="{% url 'courses:lesson_detail' course.slug lesson.id %}" class="text-decoration-none fw-semibold text-dark">
+                                                            {{ lesson.title }}
+                                                        </a>
+                                                    {% else %}
+                                                        <span class="fw-semibold text-muted">{{ lesson.title }}</span>
+                                                    {% endif %}
+                                                    {% if lesson.description %}
+                                                        <div class="text-muted small mt-1">{{ lesson.description|truncatewords:15 }}</div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            <div class="d-flex align-items-center gap-2">
+                                                {% if lesson.duration_minutes %}
+                                                    <span class="text-muted small">
+                                                        <i class="fas fa-clock me-1"></i>{{ lesson.duration_minutes }}m
+                                                    </span>
+                                                {% endif %}
+                                                {% if lesson.is_free %}
+                                                    <span class="badge bg-success">{% trans "Free" %}</span>
+                                                {% elif not user_owns_course %}
+                                                    <span class="badge bg-warning">{% trans "Premium" %}</span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="text-center py-5">
+                                <i class="fas fa-book-open fa-3x text-muted mb-3"></i>
+                                <p class="text-muted">{% trans "No lessons available yet." %}</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Purchase Card -->
+                <div class="card border-0 shadow-lg sticky-top mb-4" style="top: 100px;">
+                    <div class="card-body p-4">
+                        {% if user.is_authenticated %}
+                            {% if user_owns_course %}
+                                <div class="text-center mb-4">
+                                    <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                                    <h5 class="fw-bold text-success">{% trans "You own this course" %}</h5>
+                                </div>
+                                <a href="{% url 'courses:course_detail' course.slug %}" class="btn btn-success btn-lg w-100 mb-3">
+                                    <i class="fas fa-play me-2"></i>{% trans "Continue Learning" %}
+                                </a>
+                            {% else %}
+                                <div class="text-center mb-4">
+                                    <div class="display-4 fw-bold text-primary mb-2">${{ course.price }}</div>
+                                    {% if course.original_price and course.original_price > course.price %}
+                                        <div class="text-muted">
+                                            <del>${{ course.original_price }}</del>
+                                            <span class="badge bg-danger ms-2">{% trans "Sale" %}</span>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <button id="checkout-button" class="btn btn-primary btn-lg w-100 mb-3" type="button">
+                                    <i class="fas fa-shopping-cart me-2"></i>{% trans "Buy Now" %}
+                                </button>
+                                <div class="text-center text-muted small">
+                                    <i class="fas fa-shield-alt me-1"></i>
+                                    {% trans "30-day money-back guarantee" %}
+                                </div>
+                            {% endif %}
+                        {% else %}
+                            <div class="text-center mb-4">
+                                <div class="display-4 fw-bold text-primary mb-2">${{ course.price }}</div>
+                                <p class="text-muted">{% trans "Please login to purchase this course" %}</p>
+                            </div>
+                            <a href="{% url 'account_login' %}" class="btn btn-warning btn-lg w-100 mb-3">
+                                <i class="fas fa-sign-in-alt me-2"></i>{% trans "Login to Buy" %}
+                            </a>
+                        {% endif %}
+                        
+                        <!-- Course Features -->
+                        <hr class="my-4">
+                        <div class="d-flex flex-column gap-3">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-infinity text-primary me-3"></i>
+                                <span class="text-muted">{% trans "Lifetime access" %}</span>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-mobile-alt text-primary me-3"></i>
+                                <span class="text-muted">{% trans "Access on mobile and TV" %}</span>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-certificate text-primary me-3"></i>
+                                <span class="text-muted">{% trans "Certificate of completion" %}</span>
+                            </div>
+                            {% if course.language %}
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-language text-primary me-3"></i>
+                                <span class="text-muted">{{ course.get_language_display }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Instructor Card -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3">
+                            <i class="fas fa-chalkboard-teacher text-primary me-2"></i>
+                            {% trans "Instructor" %}
+                        </h5>
+                        <div class="d-flex align-items-center mb-3">
+                            {% if course.instructor.user.avatar %}
+                                <img src="{{ course.instructor.user.avatar.url }}" class="rounded-circle me-3" style="width: 60px; height: 60px; object-fit: cover;" alt="{{ course.instructor.user.get_full_name }}">
+                            {% else %}
+                                <div class="bg-primary rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                    <i class="fas fa-user text-white fa-lg"></i>
+                                </div>
+                            {% endif %}
+                            <div>
+                                <h6 class="fw-bold mb-1">
+                                    <a href="{% url 'courses:instructor_detail' course.instructor.user.username %}" class="text-decoration-none text-dark">
+                                        {{ course.instructor.user.get_full_name }}
+                                    </a>
+                                </h6>
+                                {% if course.instructor.title %}
+                                    <div class="text-muted small">{{ course.instructor.title }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% if course.instructor.bio %}
+                            <p class="text-muted small mb-3">{{ course.instructor.bio|truncatewords:20 }}</p>
+                        {% endif %}
+                        <a href="{% url 'courses:instructor_detail' course.instructor.user.username %}" class="btn btn-outline-primary btn-sm">
+                            {% trans "View Profile" %}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Reviews Section -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-0 p-4">
+                        <h3 class="fw-bold mb-0">
+                            <i class="fas fa-star text-warning me-2"></i>
+                            {% trans "Student Reviews" %}
+                        </h3>
+                        {% if reviews %}
+                            <div class="d-flex align-items-center mt-3">
+                                <div class="display-6 fw-bold text-warning me-3">{{ course.rating|floatformat:1 }}</div>
+                                <div>
+                                    <div class="d-flex align-items-center mb-1">
+                                        {% for i in "12345" %}
+                                            {% if forloop.counter <= course.rating|floatformat:0 %}
+                                                <i class="fas fa-star text-warning"></i>
+                                            {% else %}
+                                                <i class="far fa-star text-muted"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                    <div class="text-muted small">{{ course.total_reviews }} {% trans "reviews" %}</div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="card-body p-4">
+                        {% if reviews %}
+                            <div class="row">
+                                {% for review in reviews %}
+                                    <div class="col-md-6 mb-4">
+                                        <div class="border rounded p-3 h-100">
+                                            <div class="d-flex align-items-center mb-2">
+                                                {% if review.student.avatar %}
+                                                    <img src="{{ review.student.avatar.url }}" class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;" alt="{{ review.student.get_full_name }}">
+                                                {% else %}
+                                                    <div class="bg-primary rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                                        <i class="fas fa-user text-white"></i>
+                                                    </div>
+                                                {% endif %}
+                                                <div class="flex-grow-1">
+                                                    <div class="fw-semibold">{{ review.student.get_full_name|default:review.student.username }}</div>
+                                                    <div class="d-flex align-items-center">
+                                                        {% for i in "12345" %}
+                                                            {% if forloop.counter <= review.rating %}
+                                                                <i class="fas fa-star text-warning small"></i>
+                                                            {% else %}
+                                                                <i class="far fa-star text-muted small"></i>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                        <span class="text-muted small ms-2">{{ review.created_at|timesince }} {% trans "ago" %}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {% if review.comment %}
+                                                <p class="text-muted mb-0">{{ review.comment }}</p>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="text-center py-5">
+                                <i class="fas fa-comments fa-3x text-muted mb-3"></i>
+                                <p class="text-muted">{% trans "No reviews yet. Be the first to review this course!" %}</p>
+                            </div>
+                        {% endif %}
+                        
+                        <!-- Add Review Form -->
+                        {% if user.is_authenticated and user_owns_course %}
+                            <hr class="my-4">
+                            <h4 class="fw-bold mb-3">
+                                <i class="fas fa-edit text-primary me-2"></i>
+                                {% trans "Write a Review" %}
+                            </h4>
+                            <form method="post" action="{% url 'courses:add_review' course.slug %}">
+                                {% csrf_token %}
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="rating" class="form-label fw-semibold">
+                                            <i class="fas fa-star text-warning me-1"></i>
+                                            {% trans "Rating" %}
+                                        </label>
+                                        <select name="rating" id="rating" class="form-select">
+                                            <option value="">{% trans "Select a rating" %}</option>
+                                            {% for i in "12345" %}
+                                                <option value="{{ i }}">
+                                                    {{ i }} {% if i == "1" %}{% trans "Star" %}{% else %}{% trans "Stars" %}{% endif %}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-12 mb-3">
+                                        <label for="comment" class="form-label fw-semibold">
+                                            <i class="fas fa-comment text-primary me-1"></i>
+                                            {% trans "Comment" %}
+                                        </label>
+                                        <textarea name="comment" id="comment" class="form-control" rows="4" placeholder="{% trans 'Share your experience with this course...' %}"></textarea>
+                                    </div>
+                                    <div class="col-12">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-paper-plane me-2"></i>
+                                            {% trans "Submit Review" %}
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        {% elif user.is_authenticated and not user_owns_course %}
+                            <div class="alert alert-info mt-4">
+                                <i class="fas fa-info-circle me-2"></i>
+                                {% trans "You need to purchase this course to leave a review." %}
+                            </div>
+                        {% elif not user.is_authenticated %}
+                            <div class="alert alert-warning mt-4">
+                                <i class="fas fa-sign-in-alt me-2"></i>
+                                {% trans "Please" %} <a href="{% url 'account_login' %}" class="alert-link">{% trans "login" %}</a> {% trans "to leave a review." %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
         </div>
     </div>

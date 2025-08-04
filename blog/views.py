@@ -20,7 +20,7 @@ class CanPublishMixin(UserPassesTestMixin):
         return user.is_authenticated and (
             user.is_superuser or 
             user.is_staff or 
-            user.user_type == 'instructor'
+            user.is_instructor
         )
 
 
@@ -185,7 +185,7 @@ class MyArticlesView(LoginRequiredMixin, ListView):
     def dispatch(self, request, *args, **kwargs):
         # Only allow instructors and admins
         if not (request.user.is_superuser or request.user.is_staff or 
-                request.user.user_type == 'instructor'):
+                request.user.is_instructor):
             messages.error(request, _('You do not have permission to access this page.'))
             return redirect('blog:article_list')
         return super().dispatch(request, *args, **kwargs)
@@ -193,7 +193,6 @@ class MyArticlesView(LoginRequiredMixin, ListView):
 
 @login_required
 def add_comment(request, slug):
-    """إضافة تعليق على المقال"""
     article = get_object_or_404(Article, slug=slug)
     
     if request.method == 'POST':

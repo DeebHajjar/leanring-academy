@@ -1,19 +1,22 @@
 {% extends 'base.html' %}
 {% load i18n %}
 
-{% block title %}{% trans "Payment Successful" %}{% endblock %}
+{% block title %}{% trans "Payment Successful" %} - {{ block.super }}{% endblock %}
 
 {% block content %}
 <div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow">
+        <div class="col-lg-8 col-md-10">
+            <div class="card border-0 shadow-lg">
                 <div class="card-body text-center p-5">
+                    <!-- Success Animation -->
                     <div class="mb-4">
-                        <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
+                        <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 120px; height: 120px;">
+                            <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
+                        </div>
                     </div>
                     
-                    <h2 class="text-success mb-3">{% trans "Payment Successful!" %}</h2>
+                    <h1 class="display-5 fw-bold text-success mb-3">{% trans "Payment Successful!" %}</h1>
                     
                     {% if order and course %}
                         <p class="lead mb-4">
@@ -22,35 +25,65 @@
                             {% endblocktrans %}
                         </p>
                         
-                        <div class="card mb-4">
+                        <div class="card border-0 bg-light mb-4">
                             <div class="card-body">
-                                <h5 class="card-title">{% trans "Order Details" %}</h5>
-                                <div class="row">
-                                    <div class="col-sm-6">
-                                        <strong>{% trans "Order ID:" %}</strong> {{ order.order_id }}
+                                <h5 class="card-title text-center mb-4">
+                                    <i class="fas fa-receipt me-2 text-primary"></i>
+                                    {% trans "Order Details" %}
+                                </h5>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="d-flex align-items-center p-3 bg-white rounded">
+                                            <i class="fas fa-hashtag text-primary me-3"></i>
+                                            <div>
+                                                <small class="text-muted">{% trans "Order ID" %}</small>
+                                                <div class="fw-bold">{{ order.order_id }}</div>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="col-sm-6">
-                                        <strong>{% trans "Amount:" %}</strong> ${{ order.amount }}
+                                    <div class="col-md-6">
+                                        <div class="d-flex align-items-center p-3 bg-white rounded">
+                                            <i class="fas fa-dollar-sign text-success me-3"></i>
+                                            <div>
+                                                <small class="text-muted">{% trans "Amount" %}</small>
+                                                <div class="fw-bold text-success">${{ order.amount }}</div>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="col-sm-6">
-                                        <strong>{% trans "Course:" %}</strong> {{ course.title }}
+                                    <div class="col-md-6">
+                                        <div class="d-flex align-items-center p-3 bg-white rounded">
+                                            <i class="fas fa-book text-info me-3"></i>
+                                            <div>
+                                                <small class="text-muted">{% trans "Course" %}</small>
+                                                <div class="fw-bold">{{ course.title }}</div>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="col-sm-6">
-                                        <strong>{% trans "Date:" %}</strong> {{ order.completed_at|date:"M d, Y" }}
+                                    <div class="col-md-6">
+                                        <div class="d-flex align-items-center p-3 bg-white rounded">
+                                            <i class="fas fa-calendar text-warning me-3"></i>
+                                            <div>
+                                                <small class="text-muted">{% trans "Date" %}</small>
+                                                <div class="fw-bold">{{ order.completed_at|date:"M d, Y" }}</div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         
-                        <div class="d-flex justify-content-center gap-3">
-                            <a href="{% url 'courses:course_detail' course.slug %}" class="btn btn-primary">
-                                <i class="fas fa-play me-2"></i>{% trans "Start Learning" %}
+                        <div class="d-flex flex-column flex-sm-row justify-content-center gap-3">
+                            <a href="{% url 'courses:my_lessons' course.slug %}" class="btn btn-primary btn-lg px-4">
+                                <i class="fas fa-play me-2"></i>
+                                {% trans "Start Learning" %}
                             </a>
-                            <a href="{% url 'courses:course_list' %}" class="btn btn-outline-primary">
-                                <i class="fas fa-book me-2"></i>{% trans "Browse More Courses" %}
+                            <a href="{% url 'courses:course_list' %}" class="btn btn-outline-primary btn-lg px-4">
+                                <i class="fas fa-book me-2"></i>
+                                {% trans "Browse More Courses" %}
                             </a>
-                            <a href="{% url 'payments:order_history' %}" class="btn btn-outline-secondary">
-                                <i class="fas fa-history me-2"></i>{% trans "Order History" %}
+                            <a href="{% url 'payments:order_history' %}" class="btn btn-outline-secondary btn-lg px-4">
+                                <i class="fas fa-history me-2"></i>
+                                {% trans "Order History" %}
                             </a>
                         </div>
                     {% else %}

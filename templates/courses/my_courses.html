@@ -5,27 +5,260 @@
 {% block title %}{% trans 'My Courses' %}{% endblock %}
 
 {% block content %}
-    <div class="container py-5">
-        <h1>{% trans 'My Courses' %}</h1>
-        <div class="row">
-            {% if not page_obj %}
-            <div class="col-md-12">
-                <p>{% trans 'You have not enrolled in any courses yet.' %}</p>
-                <a href="{% url 'courses:course_list' %}" class="btn btn-primary">{% trans 'Browse Courses' %}</a>
-            </div>
-            {% endif %}
-            {% for enrollment in page_obj %}
-            <div class="col-md-4 mb-4">
-                <div class="card h-100">
-                    <img src="{{ enrollment.course.thumbnail.url }}" class="card-img-top" alt="{{ enrollment.course.title }}">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ enrollment.course.title }}</h5>
-                        <p class="card-text">{{ enrollment.course.short_description }}</p>
-                        <a href="{% url 'courses:my_lessons' enrollment.course.slug %}" class="btn btn-primary">{% trans "View Course" %}</a>
+    <!-- Page Header -->
+    <div class="bg-primary text-white py-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h1 class="display-5 fw-bold mb-3">
+                        <i class="fas fa-graduation-cap me-3"></i>
+                        {% trans "My Learning Journey" %}
+                    </h1>
+                    <p class="lead mb-0">{% trans "Continue your learning with your enrolled courses" %}</p>
+                </div>
+                <div class="col-lg-4 text-center text-lg-end">
+                    <div class="d-flex flex-column gap-2">
+                        <div class="text-white-75">
+                            <i class="fas fa-book-open me-2"></i>
+                            {{ page_obj.paginator.count|default:0 }} {% trans "enrolled courses" %}
+                        </div>
+                        {% if total_progress %}
+                            <div class="text-white-75">
+                                <i class="fas fa-chart-line me-2"></i>
+                                {{ total_progress|floatformat:0 }}% {% trans "average progress" %}
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
-            {% endfor %}
         </div>
     </div>
+    
+    <!-- Main Content -->
+    <div class="container py-5">
+        {% if page_obj %}
+            <!-- Filter and Sort Options -->
+            <div class="row mb-4">
+                <div class="col-lg-8">
+                    <div class="d-flex flex-wrap gap-2">
+                        <button class="btn btn-outline-primary active" data-filter="all">
+                            <i class="fas fa-th me-2"></i>
+                            {% trans "All Courses" %}
+                        </button>
+                        <button class="btn btn-outline-success" data-filter="in-progress">
+                            <i class="fas fa-play me-2"></i>
+                            {% trans "In Progress" %}
+                        </button>
+                        <button class="btn btn-outline-warning" data-filter="completed">
+                            <i class="fas fa-check-circle me-2"></i>
+                            {% trans "Completed" %}
+                        </button>
+                    </div>
+                </div>
+                <div class="col-lg-4 text-end">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-sort me-2"></i>
+                            {% trans "Sort by" %}
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">{% trans "Recently Accessed" %}</a></li>
+                            <li><a class="dropdown-item" href="#">{% trans "Progress" %}</a></li>
+                            <li><a class="dropdown-item" href="#">{% trans "Course Name" %}</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Courses Grid -->
+            <div class="row g-4">
+                {% for enrollment in page_obj %}
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card border-0 shadow-sm h-100 course-card" data-status="{% if enrollment.progress >= 100 %}completed{% elif enrollment.progress > 0 %}in-progress{% else %}not-started{% endif %}">
+                            <div class="position-relative">
+                                {% if enrollment.course.thumbnail %}
+                                    <img src="{{ enrollment.course.thumbnail.url }}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="{{ enrollment.course.title }}">
+                                {% else %}
+                                    <div class="bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                        <i class="fas fa-play-circle fa-3x text-muted"></i>
+                                    </div>
+                                {% endif %}
+                                
+                                <!-- Progress Badge -->
+                                <div class="position-absolute top-0 end-0 m-3">
+                                    {% if enrollment.progress >= 100 %}
+                                        <span class="badge bg-success px-3 py-2">
+                                            <i class="fas fa-check me-1"></i>
+                                            {% trans "Completed" %}
+                                        </span>
+                                    {% elif enrollment.progress > 0 %}
+                                        <span class="badge bg-warning px-3 py-2">
+                                            {{ enrollment.progress|floatformat:0 }}%
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-secondary px-3 py-2">
+                                            {% trans "Not Started" %}
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="card-body p-4">
+                                <h5 class="card-title fw-bold mb-2">
+                                    <a href="{% url 'courses:my_lessons' enrollment.course.slug %}" class="text-decoration-none text-dark">
+                                        {{ enrollment.course.title }}
+                                    </a>
+                                </h5>
+                                <p class="card-text text-muted small mb-3">{{ enrollment.course.description|truncatewords:15 }}</p>
+                                
+                                <!-- Course Info -->
+                                <div class="d-flex align-items-center justify-content-between mb-3">
+                                    <div class="d-flex align-items-center gap-3 small text-muted">
+                                        {% if enrollment.course.instructor %}
+                                            <span>
+                                                <i class="fas fa-user me-1"></i>
+                                                {{ enrollment.course.instructor.user.get_full_name|default:enrollment.course.instructor.user.username }}
+                                            </span>
+                                        {% endif %}
+                                        {% if enrollment.course.duration_hours %}
+                                            <span>
+                                                <i class="fas fa-clock me-1"></i>
+                                                {{ enrollment.course.duration_hours }}h
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <!-- Progress Bar -->
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <small class="text-muted">{% trans "Progress" %}</small>
+                                        <small class="fw-semibold">{{ enrollment.progress|default:0|floatformat:0 }}%</small>
+                                    </div>
+                                    <div class="progress" style="height: 6px;">
+                                        <div class="progress-bar {% if enrollment.progress >= 100 %}bg-success{% elif enrollment.progress > 0 %}bg-warning{% else %}bg-secondary{% endif %}" 
+                                             role="progressbar" 
+                                             style="width: {{ enrollment.progress|default:0 }}%"></div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Action Buttons -->
+                                <div class="d-flex gap-2">
+                                    <a href="{% url 'courses:my_lessons' enrollment.course.slug %}" class="btn btn-primary flex-grow-1">
+                                        {% if enrollment.progress >= 100 %}
+                                            <i class="fas fa-redo me-2"></i>
+                                            {% trans "Review" %}
+                                        {% elif enrollment.progress > 0 %}
+                                            <i class="fas fa-play me-2"></i>
+                                            {% trans "Continue" %}
+                                        {% else %}
+                                            <i class="fas fa-play me-2"></i>
+                                            {% trans "Start" %}
+                                        {% endif %}
+                                    </a>
+                                    <a href="{% url 'courses:course_detail' enrollment.course.slug %}" class="btn btn-outline-secondary" title="{% trans 'Course Details' %}">
+                                        <i class="fas fa-info-circle"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <!-- Last Accessed -->
+                            {% if enrollment.last_accessed %}
+                                <div class="card-footer bg-light border-0 py-2 px-4">
+                                    <small class="text-muted">
+                                        <i class="fas fa-clock me-1"></i>
+                                        {% trans "Last accessed" %} {{ enrollment.last_accessed|timesince }} {% trans "ago" %}
+                                    </small>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+                <div class="d-flex justify-content-center mt-5">
+                    <nav aria-label="{% trans 'Courses pagination' %}">
+                        <ul class="pagination">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </a>
+                                </li>
+                            {% endif %}
+                            
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ num }}</span>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+            {% endif %}
+        {% else %}
+            <!-- Empty State -->
+            <div class="text-center py-5">
+                <div class="mb-4">
+                    <i class="fas fa-graduation-cap fa-5x text-muted mb-4"></i>
+                    <h3 class="fw-bold mb-3">{% trans "Start Your Learning Journey" %}</h3>
+                    <p class="text-muted mb-4">{% trans "You haven't enrolled in any courses yet. Discover amazing courses and start learning today!" %}</p>
+                </div>
+                <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
+                    <a href="{% url 'courses:course_list' %}" class="btn btn-primary btn-lg px-4">
+                        <i class="fas fa-search me-2"></i>
+                        {% trans "Browse Courses" %}
+                    </a>
+                    <a href="{% url 'home' %}" class="btn btn-outline-secondary btn-lg px-4">
+                        <i class="fas fa-home me-2"></i>
+                        {% trans "Back to Home" %}
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Filter JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterButtons = document.querySelectorAll('[data-filter]');
+            const courseCards = document.querySelectorAll('.course-card');
+            
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const filter = this.getAttribute('data-filter');
+                    
+                    // Update active button
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Filter courses
+                    courseCards.forEach(card => {
+                        const status = card.getAttribute('data-status');
+                        if (filter === 'all' || status === filter) {
+                            card.style.display = 'block';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                });
+            });
+        });
+    </script>
 {% endblock %}

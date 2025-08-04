@@ -2,32 +2,329 @@
 {% load i18n %}
 {% load socialaccount %}
 
-{% block title %}{% trans course.title %}{% endblock %}
+{% block title %}{{ course.title }} - {% trans "Lessons" %}{% endblock %}
 
 {% block content %}
-    <div class="container py-5">
-        <div class="row">
-            <div class="col-md-8">
-                <h2>{% trans "Lessons" %}</h2>
-                <ol>
-                    {% for lesson in lessons %}
-                        <li>
-                            <a href="{% url 'courses:lesson_detail' course.slug lesson.id %}">{{ lesson.title }}</a>
-                            {% if lesson.lesson_progress %}
-                                {% if lesson.lesson_progress.is_completed %}
-                                    <span class="badge bg-success">{% trans "Completed" %}</span>
-                                {% else %}
-                                    <span class="badge bg-info">
-                                        {% trans "Watched" %} {{ lesson.lesson_progress.watched_duration }} {% trans "seconds" %}
-                                    </span>
-                                {% endif %}
-                            {% else %}
-                                <span class="badge bg-secondary">{% trans "Not started" %}</span>
-                            {% endif %}
-                        </li>
-                    {% endfor %}
-                </ol>
+    <!-- Course Header -->
+    <div class="bg-gradient" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        <div class="container py-5">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <!-- Breadcrumb -->
+                    <nav aria-label="breadcrumb" class="mb-3">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">
+                                <a href="{% url 'home' %}" class="text-decoration-none">
+                                    <i class="fas fa-home me-1"></i>
+                                    {% trans "Home" %}
+                                </a>
+                            </li>
+                            <li class="breadcrumb-item">
+                                <a href="{% url 'courses:my_courses' %}" class="text-decoration-none">
+                                    {% trans "My Courses" %}
+                                </a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">
+                                {{ course.title }}
+                            </li>
+                        </ol>
+                    </nav>
+                    
+                    <h1 class="display-6 fw-bold mb-3">{{ course.title }}</h1>
+                    <p class="lead mb-4">{{ course.description|truncatewords:20 }}</p>
+                    
+                    <!-- Course Stats -->
+                    <div class="d-flex flex-wrap gap-4 align-items-center">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-play-circle me-2"></i>
+                            <span>{{ lessons|length }} {% trans "lessons" %}</span>
+                        </div>
+                        {% if course.duration_hours %}
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-clock me-2"></i>
+                                <span>{{ course.duration_hours }} {% trans "hours" %}</span>
+                            </div>
+                        {% endif %}
+                        {% if course.instructor %}
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-user me-2"></i>
+                                <span>{{ course.instructor.user.get_full_name|default:course.instructor.user.username }}</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-lg-4 text-center text-lg-end">
+                    {% if course.thumbnail %}
+                        <img src="{{ course.thumbnail.url }}" class="img-fluid rounded shadow" style="max-height: 200px; width: auto;" alt="{{ course.title }}">
+                    {% else %}
+                        <div class="bg-white bg-opacity-25 rounded d-flex align-items-center justify-content-center" style="height: 200px; width: 100%;">
+                            <i class="fas fa-play-circle fa-4x text-white-50"></i>
+                        </div>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
+    
+    <!-- Main Content -->
+    <div class="container py-5">
+        <div class="row">
+            <!-- Lessons List -->
+            <div class="col-lg-8">
+                <!-- Progress Overview -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <h5 class="fw-bold mb-2">{% trans "Course Progress" %}</h5>
+                                <p class="text-muted mb-0">{{ completed_lessons|length }}/{{ lessons|length }} {% trans "lessons completed" %}</p>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <div class="progress mb-2" style="height: 8px;">
+                                    <div class="progress-bar bg-success" role="progressbar" 
+                                         style="width: {% widthratio completed_lessons|length lessons|length 100 %}%"></div>
+                                </div>
+                                <small class="text-muted">{% widthratio completed_lessons|length lessons|length 100 %}% {% trans "complete" %}</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Filter Buttons -->
+                <div class="d-flex flex-wrap gap-2 mb-4">
+                    <button class="btn btn-outline-primary active" data-filter="all">
+                        <i class="fas fa-list me-2"></i>
+                        {% trans "All Lessons" %}
+                    </button>
+                    <button class="btn btn-outline-success" data-filter="completed">
+                        <i class="fas fa-check-circle me-2"></i>
+                        {% trans "Completed" %}
+                    </button>
+                    <button class="btn btn-outline-warning" data-filter="in-progress">
+                        <i class="fas fa-play me-2"></i>
+                        {% trans "In Progress" %}
+                    </button>
+                    <button class="btn btn-outline-secondary" data-filter="not-started">
+                        <i class="fas fa-circle me-2"></i>
+                        {% trans "Not Started" %}
+                    </button>
+                </div>
+                
+                <!-- Lessons List -->
+                <div class="lessons-container">
+                    {% for lesson in lessons %}
+                        <div class="card border-0 shadow-sm mb-3 lesson-card" 
+                             data-status="{% if lesson.lesson_progress and lesson.lesson_progress.is_completed %}completed{% elif lesson.lesson_progress %}in-progress{% else %}not-started{% endif %}">
+                            <div class="card-body p-4">
+                                <div class="row align-items-center">
+                                    <div class="col-md-1 text-center">
+                                        <div class="lesson-number">
+                                            {% if lesson.lesson_progress and lesson.lesson_progress.is_completed %}
+                                                <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                                    <i class="fas fa-check"></i>
+                                                </div>
+                                            {% elif lesson.lesson_progress %}
+                                                <div class="bg-warning text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                                    <i class="fas fa-play"></i>
+                                                </div>
+                                            {% else %}
+                                                <div class="bg-light text-muted rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                                    {{ forloop.counter }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-7">
+                                        <h6 class="fw-bold mb-2">
+                                            <a href="{% url 'courses:lesson_detail' course.slug lesson.id %}" class="text-decoration-none text-dark">
+                                                {{ lesson.title }}
+                                            </a>
+                                        </h6>
+                                        {% if lesson.description %}
+                                            <p class="text-muted small mb-2">{{ lesson.description|truncatewords:15 }}</p>
+                                        {% endif %}
+                                        <div class="d-flex align-items-center gap-3 small text-muted">
+                                            {% if lesson.duration %}
+                                                <span>
+                                                    <i class="fas fa-clock me-1"></i>
+                                                    {{ lesson.duration }} {% trans "min" %}
+                                                </span>
+                                            {% endif %}
+                                            {% if lesson.is_free %}
+                                                <span class="badge bg-success-subtle text-success">
+                                                    <i class="fas fa-unlock me-1"></i>
+                                                    {% trans "Free" %}
+                                                </span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 text-end">
+                                        <!-- Progress Info -->
+                                        {% if lesson.lesson_progress %}
+                                            {% if lesson.lesson_progress.is_completed %}
+                                                <span class="badge bg-success px-3 py-2 mb-2">
+                                                    <i class="fas fa-check me-1"></i>
+                                                    {% trans "Completed" %}
+                                                </span>
+                                            {% else %}
+                                                <div class="mb-2">
+                                                    <div class="progress mb-1" style="height: 4px;">
+                                                        <div class="progress-bar bg-warning" role="progressbar" 
+                                                             style="width: {% if lesson.duration %}{% widthratio lesson.lesson_progress.watched_duration lesson.duration 100 %}{% else %}50{% endif %}%"></div>
+                                                    </div>
+                                                    <small class="text-muted">
+                                                        {% trans "Watched" %} {{ lesson.lesson_progress.watched_duration|floatformat:0 }}s
+                                                    </small>
+                                                </div>
+                                            {% endif %}
+                                        {% else %}
+                                            <span class="badge bg-secondary px-3 py-2 mb-2">
+                                                {% trans "Not started" %}
+                                            </span>
+                                        {% endif %}
+                                        
+                                        <!-- Action Button -->
+                                        <div>
+                                            <a href="{% url 'courses:lesson_detail' course.slug lesson.id %}" class="btn btn-primary btn-sm">
+                                                {% if lesson.lesson_progress and lesson.lesson_progress.is_completed %}
+                                                    <i class="fas fa-redo me-1"></i>
+                                                    {% trans "Review" %}
+                                                {% elif lesson.lesson_progress %}
+                                                    <i class="fas fa-play me-1"></i>
+                                                    {% trans "Continue" %}
+                                                {% else %}
+                                                    <i class="fas fa-play me-1"></i>
+                                                    {% trans "Start" %}
+                                                {% endif %}
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-video fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">{% trans "No lessons available" %}</h5>
+                            <p class="text-muted">{% trans "This course doesn't have any lessons yet." %}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Course Info Card -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h6 class="mb-0">
+                            <i class="fas fa-info-circle me-2"></i>
+                            {% trans "Course Information" %}
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="flex-shrink-0">
+                                {% if course.instructor.user.avatar %}
+                                    <img src="{{ course.instructor.user.avatar.url }}" class="rounded-circle" width="50" height="50" alt="{{ course.instructor.user.get_full_name }}">
+                                {% else %}
+                                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="mb-1">{{ course.instructor.user.get_full_name|default:course.instructor.user.username }}</h6>
+                                <small class="text-muted">{% trans "Instructor" %}</small>
+                            </div>
+                        </div>
+                        
+                        <div class="border-top pt-3">
+                            <div class="row text-center">
+                                <div class="col-4">
+                                    <div class="fw-bold text-primary">{{ lessons|length }}</div>
+                                    <small class="text-muted">{% trans "Lessons" %}</small>
+                                </div>
+                                <div class="col-4">
+                                    <div class="fw-bold text-success">{{ completed_lessons|length }}</div>
+                                    <small class="text-muted">{% trans "Completed" %}</small>
+                                </div>
+                                <div class="col-4">
+                                    <div class="fw-bold text-warning">{% widthratio completed_lessons|length lessons|length 100 %}%</div>
+                                    <small class="text-muted">{% trans "Progress" %}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Quick Actions -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0">
+                            <i class="fas fa-bolt me-2"></i>
+                            {% trans "Quick Actions" %}
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'courses:course_detail' course.slug %}" class="btn btn-outline-primary">
+                                <i class="fas fa-info-circle me-2"></i>
+                                {% trans "Course Details" %}
+                            </a>
+                            {% if next_lesson %}
+                                <a href="{% url 'courses:lesson_detail' course.slug next_lesson.id %}" class="btn btn-primary">
+                                    <i class="fas fa-play me-2"></i>
+                                    {% trans "Continue Learning" %}
+                                </a>
+                            {% endif %}
+                            <a href="{% url 'courses:my_courses' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>
+                                {% trans "Back to My Courses" %}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Achievement Badge -->
+                {% if completed_lessons|length == lessons|length and lessons|length > 0 %}
+                    <div class="card border-0 shadow-sm bg-success text-white">
+                        <div class="card-body text-center py-4">
+                            <i class="fas fa-trophy fa-3x mb-3"></i>
+                            <h5 class="fw-bold">{% trans "Congratulations!" %}</h5>
+                            <p class="mb-0">{% trans "You have completed this course!" %}</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Filter JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterButtons = document.querySelectorAll('[data-filter]');
+            const lessonCards = document.querySelectorAll('.lesson-card');
+            
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const filter = this.getAttribute('data-filter');
+                    
+                    // Update active button
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Filter lessons
+                    lessonCards.forEach(card => {
+                        const status = card.getAttribute('data-status');
+                        if (filter === 'all' || status === filter) {
+                            card.style.display = 'block';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                });
+            });
+        });
+    </script>
 {% endblock %}

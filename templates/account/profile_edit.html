@@ -1,22 +1,271 @@
 {% extends 'base.html' %}
 {% load i18n %}
 
-{% block title %}{% trans "Edit Profile" %}{% endblock %}
+{% block title %}{% trans "Edit Profile" %} - {{ block.super }}{% endblock %}
 
 {% block content %}
 <div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card shadow-lg border-0">
-                <div class="card-body p-5">
-                    <h2 class="fw-bold mb-4">{% trans "Edit Profile" %}</h2>
-                    <form method="post" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        {{ user_form.as_p }}
-                        {{ profile_form.as_p }}
-                        <button type="submit" class="btn btn-primary">{% trans "Save Changes" %}</button>
-                        <a href="{% url 'profile' request.user.username %}" class="btn btn-secondary ms-2">{% trans "Cancel" %}</a>
-                    </form>
+        <div class="col-lg-10">
+            <!-- Page Header -->
+            <div class="text-center mb-5">
+                <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                    <i class="fas fa-user-edit text-primary" style="font-size: 2rem;"></i>
+                </div>
+                <h1 class="fw-bold text-dark mb-2">{% trans "Edit Profile" %}</h1>
+                <p class="text-muted">{% trans "Update your personal information and preferences" %}</p>
+            </div>
+            
+            <div class="row">
+                <!-- Profile Form -->
+                <div class="col-lg-8">
+                    <div class="card border-0 shadow-lg mb-4">
+                        <div class="card-header bg-light border-0 py-3">
+                            <h5 class="mb-0">
+                                <i class="fas fa-user me-2 text-primary"></i>
+                                {% trans "Personal Information" %}
+                            </h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <form method="post" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                
+                                <!-- User Form Fields -->
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-semibold">
+                                            <i class="fas fa-user me-2 text-muted"></i>
+                                            {% trans "First Name" %}
+                                        </label>
+                                        {{ user_form.first_name }}
+                                        {% if user_form.first_name.errors %}
+                                            <div class="text-danger small mt-1">
+                                                {{ user_form.first_name.errors }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-semibold">
+                                            <i class="fas fa-user me-2 text-muted"></i>
+                                            {% trans "Last Name" %}
+                                        </label>
+                                        {{ user_form.last_name }}
+                                        {% if user_form.last_name.errors %}
+                                            <div class="text-danger small mt-1">
+                                                {{ user_form.last_name.errors }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-semibold">
+                                            <i class="fas fa-envelope me-2 text-muted"></i>
+                                            {% trans "Email" %}
+                                        </label>
+                                        {{ user_form.email }}
+                                        {% if user_form.email.errors %}
+                                            <div class="text-danger small mt-1">
+                                                {{ user_form.email.errors }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-semibold">
+                                            <i class="fas fa-at me-2 text-muted"></i>
+                                            {% trans "Username" %}
+                                        </label>
+                                        {{ user_form.username }}
+                                        {% if user_form.username.errors %}
+                                            <div class="text-danger small mt-1">
+                                                {{ user_form.username.errors }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <!-- Bio Field -->
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">
+                                        <i class="fas fa-info-circle me-2 text-muted"></i>
+                                        {% trans "Bio" %}
+                                    </label>
+                                    {{ user_form.bio }}
+                                    {% if user_form.bio.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {{ user_form.bio.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-semibold">
+                                            <i class="fas fa-phone me-2 text-muted"></i>
+                                            {% trans "Phone Number" %}
+                                        </label>
+                                        {{ user_form.phone_number }}
+                                        {% if user_form.phone_number.errors %}
+                                            <div class="text-danger small mt-1">
+                                                {{ user_form.phone_number.errors }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-semibold">
+                                            <i class="fas fa-globe me-2 text-muted"></i>
+                                            {% trans "Country" %}
+                                        </label>
+                                        {{ user_form.country }}
+                                        {% if user_form.country.errors %}
+                                            <div class="text-danger small mt-1">
+                                                {{ user_form.country.errors }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">
+                                        <i class="fas fa-map-marker-alt me-2 text-muted"></i>
+                                        {% trans "City" %}
+                                    </label>
+                                    {{ user_form.city }}
+                                    {% if user_form.city.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {{ user_form.city.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <hr class="my-4">
+
+                                <!-- Social Links -->
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">
+                                        <i class="fas fa-share-alt me-2 text-muted"></i>
+                                        {% trans "Social Links" %}
+                                    </label>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            {{ profile_form.website }}
+                                            {% if profile_form.website.errors %}
+                                                <div class="text-danger small mt-1">
+                                                    {{ profile_form.website.errors }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            {{ profile_form.linkedin }}
+                                            {% if profile_form.linkedin.errors %}
+                                                <div class="text-danger small mt-1">
+                                                    {{ profile_form.linkedin.errors }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            {{ profile_form.github }}
+                                            {% if profile_form.github.errors %}
+                                                <div class="text-danger small mt-1">
+                                                    {{ profile_form.github.errors }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            {{ profile_form.preferred_language }}
+                                            {% if profile_form.preferred_language.errors %}
+                                                <div class="text-danger small mt-1">
+                                                    {{ profile_form.preferred_language.errors }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Profile Picture Upload -->
+                                <hr class="my-4">
+                                <h6 class="fw-bold mb-3">
+                                    <i class="fas fa-camera me-2 text-primary"></i>
+                                    {% trans "Profile Picture" %}
+                                </h6>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label fw-semibold">
+                                        <i class="fas fa-image me-2 text-muted"></i>
+                                        {% trans "Upload Avatar" %}
+                                    </label>
+                                    <input type="file" name="avatar" class="form-control" accept="image/*">
+                                    <div class="form-text text-muted">
+                                        {% trans "Choose a profile picture (JPG, PNG, GIF - Max 5MB)" %}
+                                    </div>
+                                    {% if user.avatar %}
+                                        <div class="mt-2">
+                                            <small class="text-muted">{% trans "Current:" %}</small>
+                                            <img src="{{ user.avatar.url }}" class="rounded ms-2" style="width: 50px; height: 50px; object-fit: cover;" alt="Current avatar">
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Action Buttons -->
+                                <div class="d-flex gap-3">
+                                    <button type="submit" class="btn btn-primary btn-lg px-4">
+                                        <i class="fas fa-save me-2"></i>
+                                        {% trans "Save Changes" %}
+                                    </button>
+                                    <a href="{% url 'profile' user.username %}" class="btn btn-outline-secondary btn-lg px-4">
+                                        <i class="fas fa-times me-2"></i>
+                                        {% trans "Cancel" %}
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Sidebar -->
+                <div class="col-lg-4">
+                    <!-- Profile Picture -->
+                    <div class="card border-0 shadow-lg mb-4">
+                        <div class="card-header bg-light border-0 py-3">
+                            <h6 class="mb-0">
+                                <i class="fas fa-camera me-2 text-primary"></i>
+                                {% trans "Profile Picture" %}
+                            </h6>
+                        </div>
+                        <div class="card-body text-center p-4">
+                            {% if user.avatar %}
+                                <img src="{{ user.avatar.url }}" class="rounded-circle mb-3" style="width: 120px; height: 120px; object-fit: cover;" alt="{{ user.username }}">
+                            {% else %}
+                                <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 120px; height: 120px;">
+                                    <i class="fas fa-user text-primary" style="font-size: 3rem;"></i>
+                                </div>
+                            {% endif %}
+                            <p class="text-muted small mb-0">{% trans "Upload a new profile picture to personalize your account" %}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Account Settings -->
+                    <div class="card border-0 shadow-lg">
+                        <div class="card-header bg-light border-0 py-3">
+                            <h6 class="mb-0">
+                                <i class="fas fa-cog me-2 text-primary"></i>
+                                {% trans "Account Settings" %}
+                            </h6>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'account_change_password' %}" class="btn btn-outline-primary">
+                                    <i class="fas fa-key me-2"></i>
+                                    {% trans "Change Password" %}
+                                </a>
+                                <a href="{% url 'account_email' %}" class="btn btn-outline-info">
+                                    <i class="fas fa-envelope me-2"></i>
+                                    {% trans "Manage Email" %}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

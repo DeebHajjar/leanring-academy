@@ -71,16 +71,16 @@ def course_detail(request, slug):
     lessons = course.lessons.all()
     reviews = course.reviews.select_related('student').order_by('-created_at')[:10]
     
-    # التحقق من ملكية المستخدم للدورة
+    # Check if the user owns the course
     user_owns_course = False
     if request.user.is_authenticated:
-        # التحقق من وجود enrollment للمستخدم في الدورة
+        # Check if the user has an enrollment for the course
         user_owns_course = Enrollment.objects.filter(
             student=request.user,
             course=course
         ).exists()
         
-        # إذا لم يجد enrollment، تحقق من وجود طلب مكتمل (fallback)
+        # If no enrollment is found, check for a completed order (fallback)
         if not user_owns_course:
             from payments.models import Order
             user_owns_course = Order.objects.filter(
@@ -113,35 +113,49 @@ def lesson_detail(request, course_slug, lesson_id):
     next_lesson = lessons[current_index + 1] if current_index is not None and current_index < len(lessons) - 1 else None
     
     is_enrolled = False
+    enrollment = None
+    course_progress = 0
+    completed_lessons = 0
+    total_lessons = len(lessons)
     
     reviews = course.reviews.select_related('student').order_by('-created_at')[:10]
     
     comment_form = CommentForm()
-    comments = lesson.comments.filter(parent__isnull=True, is_active=True).order_by('created_at')
+    # Load comments with their replies using prefetch_related
+    comments = lesson.comments.filter(parent__isnull=True, is_active=True).prefetch_related(
+        'children__user'
+    ).select_related('user').order_by('created_at')
     
     if request.user.is_authenticated:
         is_enrolled = Enrollment.objects.filter(student=request.user, course=course).exists()
+        
+        if is_enrolled:
+            try:
+                enrollment = Enrollment.objects.get(student=request.user, course=course)
+                
+                # Calculate course progress
+                lesson_progresses = LessonProgress.objects.filter(
+                    enrollment=enrollment,
+                    lesson__in=lessons
+                )
+                completed_lessons = lesson_progresses.filter(is_completed=True).count()
+                if total_lessons > 0:
+                    course_progress = (completed_lessons / total_lessons) * 100
+                    
+            except Enrollment.DoesNotExist:
+                enrollment = None
 
     if not lesson.is_free and not is_enrolled:
         messages.error(request, _('You must enroll in the course to access this lesson.'))
         return redirect('courses:course_detail', slug=course.slug)
     
-    enrollment = None
-    if request.user.is_authenticated:
-        try:
-            enrollment = Enrollment.objects.get(student=request.user, course=course)
-            is_enrolled = True
-        except Enrollment.DoesNotExist:
-            if not lesson.is_free:
-                messages.error(request, _('You are not enrolled in this course.'))
-    
     review_form = ReviewForm()
     user_review = None
-    if request.user.is_authenticated:
+    if request.user.is_authenticated and is_enrolled:
         try:
             user_review = Review.objects.get(course=course, student=request.user)
         except Review.DoesNotExist:
-            messages.error(request, _('You are not enrolled in this course.'))
+            pass  # User hasn't reviewed yet, which is fine
     
     context = {
         'lesson': lesson,
@@ -155,6 +169,9 @@ def lesson_detail(request, course_slug, lesson_id):
         'previous_lesson': previous_lesson,
         'next_lesson': next_lesson,
         'comments': comments,
+        'course_progress': course_progress,
+        'completed_lessons': completed_lessons,
+        'total_lessons': total_lessons,
     }
     return render(
         request,
@@ -222,7 +239,7 @@ def my_lessons(request, course_slug):
         messages.error(request, _('You must enroll in this course to access its lessons.'))
         return redirect('courses:course_detail', slug=course.slug)
     
-    lessons = course.lessons.all()
+    lessons = course.lessons.all().order_by('order')
     # Get the user's enrollments
     enrollment = Enrollment.objects.get(student=request.user, course=course)
     
@@ -230,8 +247,19 @@ def my_lessons(request, course_slug):
     lesson_progress_map = {
         lp.lesson_id: lp for lp in LessonProgress.objects.filter(enrollment=enrollment, lesson__in=lessons)
     }
+    
+    completed_lessons = []
+    next_lesson = None
+    
     for lesson in lessons:
-        lesson.lesson_progress = lesson_progress_map.get(lesson.id)
+        lesson_progress = lesson_progress_map.get(lesson.id)
+        lesson.lesson_progress = lesson_progress
+        
+        # Check if lesson is completed
+        if lesson_progress and lesson_progress.is_completed:
+            completed_lessons.append(lesson)
+        elif not next_lesson and (not lesson_progress or not lesson_progress.is_completed):
+            next_lesson = lesson
     
     paginator = Paginator(lessons, 12)
     page_number = request.GET.get('page')
@@ -241,6 +269,8 @@ def my_lessons(request, course_slug):
         'page_obj': page_obj,
         'course': course,
         'lessons': lessons,
+        'completed_lessons': completed_lessons,
+        'next_lesson': next_lesson,
     }
     
     return render(request, 'courses/my_lessons.html', context)
@@ -274,6 +304,31 @@ def add_comment(request, lesson_id):
         messages.success(request, _('Comment added successfully!'))
     else:
         messages.error(request, _('Please correct the errors in your comment.'))
+    
+    return redirect('courses:lesson_detail', 
+                   course_slug=lesson.course.slug, lesson_id=lesson.id)
+
+
+@login_required
+@require_POST
+def add_reply(request, comment_id):
+    """Add a reply to a comment"""
+    parent_comment = get_object_or_404(Comment, id=comment_id)
+    lesson = parent_comment.lesson
+    
+    # Check if user is enrolled in the course
+    enrollment = get_object_or_404(Enrollment, student=request.user, course=lesson.course)
+    
+    form = CommentForm(request.POST)
+    if form.is_valid():
+        reply = form.save(commit=False)
+        reply.lesson = lesson
+        reply.user = request.user
+        reply.parent = parent_comment
+        reply.save()
+        messages.success(request, _('Reply added successfully!'))
+    else:
+        messages.error(request, _('Please correct the errors in your reply.'))
     
     return redirect('courses:lesson_detail', 
                    course_slug=lesson.course.slug, lesson_id=lesson.id)

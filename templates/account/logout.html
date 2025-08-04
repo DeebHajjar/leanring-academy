@@ -2,26 +2,67 @@
 {% load i18n %}
 {% load socialaccount %}
 
-{% block title %}{% trans "Sign Out" %}{% endblock %}
+{% block title %}{% trans "Sign Out" %} - {{ block.super }}{% endblock %}
 
 {% block content %}
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <div class="card shadow">
-                    <div class="card-header bg-danger text-white text-center">
-                        <h3>{% trans "Sign Out" %}</h3>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-5 col-md-7">
+            <!-- Sign Out Card -->
+            <div class="card border-0 shadow-lg">
+                <div class="card-body p-5">
+                    <!-- Header -->
+                    <div class="text-center mb-4">
+                        <div class="bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                            <i class="fas fa-sign-out-alt text-warning" style="font-size: 2rem;"></i>
+                        </div>
+                        <h2 class="fw-bold text-dark mb-2">{% trans "Sign Out" %}</h2>
+                        <p class="text-muted">{% trans "We're sorry to see you go!" %}</p>
                     </div>
-                    <div class="card-body">
-                        <p>{% trans "Are you sure you want to sign out?" %}</p>
-                        <form method="post">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-danger">{% trans "Sign Out" %}</button>
-                        </form>
+                    
+                    <!-- Confirmation Message -->
+                    <div class="bg-light rounded p-4 mb-4">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-question-circle text-warning me-3" style="font-size: 1.5rem;"></i>
+                            <div>
+                                <h6 class="mb-1 fw-semibold">{% trans "Confirm Sign Out" %}</h6>
+                                <p class="mb-0 text-muted small">{% trans "Are you sure you want to sign out of your account?" %}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <a href="{% url 'home' %}" class="btn btn-outline-secondary w-100 py-3">
+                                    <i class="fas fa-arrow-left me-2"></i>
+                                    {% trans "Cancel" %}
+                                </a>
+                            </div>
+                            <div class="col-6">
+                                <button type="submit" class="btn btn-warning w-100 py-3">
+                                    <i class="fas fa-sign-out-alt me-2"></i>
+                                    {% trans "Sign Out" %}
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    
+                    <!-- Quick Links -->
+                    <div class="text-center mt-4">
+                        <p class="text-muted mb-0 small">
+                            {% trans "Want to come back later?" %}
+                            <a href="{% url 'courses:course_list' %}" class="text-decoration-none">
+                                {% trans "Browse Courses" %}
+                            </a>
+                        </p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 {% endblock %}
 

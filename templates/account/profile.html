@@ -1,68 +1,195 @@
 {% extends 'base.html' %}
 {% load i18n %}
 
-{% block title %}{% trans "Profile" %}{% endblock %}
+{% block title %}{% trans "Profile" %} - {{ block.super }}{% endblock %}
 
 {% block content %}
 <div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card shadow-lg border-0">
-                <div class="card-body p-5">
-                    <div class="row align-items-center mb-4">
-                        <div class="col-md-4 text-center mb-3 mb-md-0">
-                            {% if user.avatar %}
-                                <img src="{{ user.avatar.url }}" class="rounded-circle img-thumbnail" style="width: 140px; height: 140px; object-fit: cover;" alt="{{ user.username }}">
-                            {% elif user.profile_picture_url %}
-                                <img src="{{ user.profile_picture_url }}" class="rounded-circle img-thumbnail" style="width: 140px; height: 140px; object-fit: cover;" alt="{{ user.username }}">
-                            {% else %}
-                                <img src="https://ui-avatars.com/api/?name={{ user.username|default:user.email }}&size=140" class="rounded-circle img-thumbnail" alt="Avatar">
-                            {% endif %}
+        <div class="col-lg-10">
+            <!-- Profile Header Card -->
+            <div class="card border-0 shadow-lg mb-4">
+                <div class="card-body p-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-3 text-center mb-3 mb-md-0">
+                            <div class="position-relative d-inline-block">
+                                {% if user.avatar %}
+                                    <img src="{{ user.avatar.url }}" class="rounded-circle border border-3 border-primary" style="width: 120px; height: 120px; object-fit: cover;" alt="{{ user.username }}">
+                                {% elif user.profile_picture_url %}
+                                    <img src="{{ user.profile_picture_url }}" class="rounded-circle border border-3 border-primary" style="width: 120px; height: 120px; object-fit: cover;" alt="{{ user.username }}">
+                                {% else %}
+                                    <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center border border-3 border-primary" style="width: 120px; height: 120px;">
+                                        <i class="fas fa-user text-primary" style="font-size: 3rem;"></i>
+                                    </div>
+                                {% endif %}
+                                {% if user.is_verified %}
+                                    <span class="position-absolute bottom-0 end-0 bg-success rounded-circle p-2">
+                                        <i class="fas fa-check text-white" style="font-size: 0.8rem;"></i>
+                                    </span>
+                                {% endif %}
+                            </div>
                         </div>
-                        <div class="col-md-8">
-                            <h2 class="fw-bold mb-1">{{ user.get_full_name|default:user.username }}</h2>
-                            <p class="mb-2"><span class="fw-semibold">{% trans "Email" %}:</span> {{ user.email }}</p>
-                            {% if user.phone_number %}
-                            <p class="mb-2"><span class="fw-semibold">{% trans "Phone" %}:</span> {{ user.phone_number }}</p>
-                            {% endif %}
-                            {% if user.country %}
-                            <p class="mb-2"><span class="fw-semibold">{% trans "Country" %}:</span> {{ user.country }}</p>
-                            {% endif %}
-                            {% if user.city %}
-                            <p class="mb-2"><span class="fw-semibold">{% trans "City" %}:</span> {{ user.city }}</p>
-                            {% endif %}
-                            <span class="badge bg-success me-2">{% if user.is_instructor %}{% trans "Instructor" %}{% else %}{% trans "Student" %}{% endif %}</span>
-                            {% if user.is_verified %}
-                            <span class="badge bg-info">{% trans "Verified" %}</span>
+                        <div class="col-md-6">
+                            <h2 class="fw-bold mb-2 text-dark">{{ user.get_full_name|default:user.username }}</h2>
+                            <div class="mb-3">
+                                <span class="badge bg-primary me-2 px-3 py-2">
+                                    <i class="fas fa-user-graduate me-1"></i>
+                                    {% if user.is_instructor %}{% trans "Instructor" %}{% else %}{% trans "Student" %}{% endif %}
+                                </span>
+                                {% if user.is_verified %}
+                                    <span class="badge bg-success px-3 py-2">
+                                        <i class="fas fa-check-circle me-1"></i>
+                                        {% trans "Verified" %}
+                                    </span>
+                                {% endif %}
+                            </div>
+                            <div class="text-muted">
+                                <p class="mb-1">
+                                    <i class="fas fa-envelope me-2 text-primary"></i>
+                                    {{ user.email }}
+                                </p>
+                                {% if user.phone_number %}
+                                <p class="mb-1">
+                                    <i class="fas fa-phone me-2 text-primary"></i>
+                                    {{ user.phone_number }}
+                                </p>
+                                {% endif %}
+                                {% if user.country or user.city %}
+                                <p class="mb-1">
+                                    <i class="fas fa-map-marker-alt me-2 text-primary"></i>
+                                    {% if user.city %}{{ user.city }}{% endif %}{% if user.city and user.country %}, {% endif %}{% if user.country %}{{ user.country }}{% endif %}
+                                </p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-3 text-center text-md-end">
+                            {% if is_owner %}
+                                <a href="{% url 'profile_edit' user.username %}" class="btn btn-primary btn-lg px-4">
+                                    <i class="fas fa-edit me-2"></i>
+                                    {% trans "Edit Profile" %}
+                                </a>
+                            {% else %}
+                                <div class="d-flex flex-column gap-2">
+                                    {% if user.is_instructor %}
+                                        <span class="badge bg-success px-3 py-2">
+                                            <i class="fas fa-chalkboard-teacher me-1"></i>
+                                            {% trans "Instructor" %}
+                                        </span>
+                                    {% endif %}
+                                    {% if user.is_verified %}
+                                        <span class="badge bg-info px-3 py-2">
+                                            <i class="fas fa-check-circle me-1"></i>
+                                            {% trans "Verified User" %}
+                                        </span>
+                                    {% endif %}
+                                </div>
                             {% endif %}
                         </div>
                     </div>
                     {% if user.bio %}
-                    <p class="mb-2"><span class="fw-semibold"></span> {{ user.bio }}</p>
+                    <hr class="my-4">
+                    <div class="bg-light rounded p-3">
+                        <h6 class="fw-bold mb-2 text-dark">
+                            <i class="fas fa-info-circle me-2 text-primary"></i>
+                            {% trans "About" %}
+                        </h6>
+                        <p class="mb-0 text-muted">{{ user.bio }}</p>
+                    </div>
                     {% endif %}
-                    <hr>
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <h5 class="fw-bold mb-3">{% trans "Profile Details" %}</h5>
-                            <ul class="list-group list-group-flush">
-                                {% if profile.website %}
-                                <li class="list-group-item"><strong>{% trans "Website" %}:</strong> <a href="{{ profile.website }}" target="_blank">{{ profile.website }}</a></li>
-                                {% endif %}
-                                {% if profile.linkedin %}
-                                <li class="list-group-item"><strong>{% trans "LinkedIn" %}:</strong> <a href="{{ profile.linkedin }}" target="_blank">{{ profile.linkedin }}</a></li>
-                                {% endif %}
-                                {% if profile.github %}
-                                <li class="list-group-item"><strong>{% trans "GitHub" %}:</strong> <a href="{{ profile.github }}" target="_blank">{{ profile.github }}</a></li>
-                                {% endif %}
-                                <li class="list-group-item"><strong>{% trans "Preferred Language" %}:</strong> {{ profile.preferred_language }}</li>
-                            </ul>
+            
+            <!-- Additional Information Card -->
+            {% if profile.website or profile.linkedin or profile.github or profile.preferred_language %}
+            <div class="card border-0 shadow-lg mb-4">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-4 text-dark">
+                        <i class="fas fa-info-circle me-2 text-primary"></i>
+                        {% trans "Additional Information" %}
+                    </h5>
+                    <div class="row">
+                        {% if profile.website %}
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-globe me-3 text-primary"></i>
+                                <div>
+                                    <small class="text-muted d-block">{% trans "Website" %}</small>
+                                    <a href="{{ profile.website }}" target="_blank" class="text-decoration-none">{{ profile.website }}</a>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-md-6 d-flex align-items-end justify-content-end">
-                            {% if is_owner %}
-                                <a href="{% url 'profile_edit' request.user.username %}" class="btn btn-outline-primary btn-lg mt-3 mt-md-0">
-                                    <i class="bi bi-pencil-square me-2"></i>{% trans "Edit Profile" %}
-                                </a>
-                            {% endif %}
+                        {% endif %}
+                        {% if profile.linkedin %}
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex align-items-center">
+                                <i class="fab fa-linkedin me-3 text-primary"></i>
+                                <div>
+                                    <small class="text-muted d-block">{% trans "LinkedIn" %}</small>
+                                    <a href="{{ profile.linkedin }}" target="_blank" class="text-decoration-none">LinkedIn</a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if profile.github %}
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex align-items-center">
+                                <i class="fab fa-github me-3 text-primary"></i>
+                                <div>
+                                    <small class="text-muted d-block">{% trans "GitHub" %}</small>
+                                    <a href="{{ profile.github }}" target="_blank" class="text-decoration-none">GitHub</a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if profile.preferred_language %}
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-language me-3 text-primary"></i>
+                                <div>
+                                    <small class="text-muted d-block">{% trans "Preferred Language" %}</small>
+                                    <span class="fw-semibold">{{ profile.preferred_language }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Statistics Card -->
+            <div class="card border-0 shadow-lg">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-4 text-dark">
+                        <i class="fas fa-chart-bar me-2 text-primary"></i>
+                        {% trans "Statistics" %}
+                    </h5>
+                    <div class="row text-center">
+                        <div class="col-md-3 mb-3">
+                            <div class="bg-primary bg-opacity-10 rounded p-3">
+                                <i class="fas fa-book text-primary mb-2" style="font-size: 2rem;"></i>
+                                <h4 class="fw-bold text-primary mb-1">{{ user.enrolled_courses.count|default:0 }}</h4>
+                                <small class="text-muted">{% trans "Enrolled Courses" %}</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="bg-success bg-opacity-10 rounded p-3">
+                                <i class="fas fa-certificate text-success mb-2" style="font-size: 2rem;"></i>
+                                <h4 class="fw-bold text-success mb-1">{{ user.completed_courses.count|default:0 }}</h4>
+                                <small class="text-muted">{% trans "Completed Courses" %}</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="bg-warning bg-opacity-10 rounded p-3">
+                                <i class="fas fa-clock text-warning mb-2" style="font-size: 2rem;"></i>
+                                <h4 class="fw-bold text-warning mb-1">{{ user.total_learning_hours|default:0 }}</h4>
+                                <small class="text-muted">{% trans "Learning Hours" %}</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="bg-info bg-opacity-10 rounded p-3">
+                                <i class="fas fa-calendar-alt text-info mb-2" style="font-size: 2rem;"></i>
+                                <h4 class="fw-bold text-info mb-1">{{ user.date_joined|date:"M Y" }}</h4>
+                                <small class="text-muted">{% trans "Member Since" %}</small>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -70,6 +197,4 @@
         </div>
     </div>
 </div>
-<!-- Bootstrap Icons CDN -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 {% endblock %}

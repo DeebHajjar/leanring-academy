@@ -2,28 +2,37 @@
 {% load i18n %}
 {% load socialaccount %}
 
-{% block title %}{% trans "Create New Account" %}{% endblock %}
+{% block title %}{% trans "Create Account" %} - {{ block.super }}{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
+<div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow">
-                <div class="card-header bg-success text-white text-center">
-                    <h3>{% trans "Create New Account" %}</h3>
-                </div>
-                <div class="card-body">
-                    <!-- Google Login -->
-                    <div class="d-grid gap-2 mb-4">
+        <div class="col-lg-6 col-md-8">
+            <!-- Sign Up Card -->
+            <div class="card border-0 shadow-lg">
+                <div class="card-body p-5">
+                    <!-- Header -->
+                    <div class="text-center mb-4">
+                        <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                            <i class="fas fa-user-plus text-success" style="font-size: 2rem;"></i>
+                        </div>
+                        <h2 class="fw-bold text-dark mb-2">{% trans "Create Account" %}</h2>
+                        <p class="text-muted">{% trans "Join our learning community today" %}</p>
+                    </div>
+                    
+                    <!-- Google Sign Up -->
+                    <div class="d-grid mb-4">
                         <a href="{% provider_login_url 'google' %}" 
-                           class="btn btn-danger btn-lg">
+                           class="btn btn-danger btn-lg py-3">
                             <i class="fab fa-google me-2"></i>
-                            {% trans "Login with Google" %}
+                            {% trans "Continue with Google" %}
                         </a>
                     </div>
                     
-                    <div class="text-center my-3">
-                        <span class="text-muted">{% trans "or" %}</span>
+                    <!-- Divider -->
+                    <div class="position-relative text-center my-4">
+                        <hr class="my-0">
+                        <span class="position-absolute top-50 start-50 translate-middle bg-white px-3 text-muted">{% trans "or" %}</span>
                     </div>
                     
                     <!-- Traditional Login Form -->

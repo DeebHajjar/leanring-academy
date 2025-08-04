@@ -3,33 +3,251 @@
 {% block title %}{{ instructor.user.get_full_name|default:instructor.user.username }}{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="row">
-        <div class="col-md-4">
-            {% if instructor.user.avatar %}
-            <img src="{{ instructor.user.avatar.url }}" alt="{{ instructor.user.get_full_name }}" class="img-fluid">
-            {% elif instructor.user.profile_picture_url %}
-            <img src="{{ instructor.user.profile_picture_url }}" alt="{{ instructor.user.get_full_name }}" class="img-fluid">
-            {% else %}
-            <img src="https://ui-avatars.com/api/?name={{ instructor.user.username|default:user.email }}&size=140" class="rounded-circle img-thumbnail" alt="Avatar">
-            {% endif %}
-        </div>
-        <div class="col-md-8">
-            <h2>{{ instructor.user.get_full_name|default:instructor.user.username }}</h2>
-            <p>{% trans "Expertise" %}: {{ instructor.expertise }}</p>
-            <p>{% trans "Years of Experience" %}: {{ instructor.experience_years }}</p>
-            <p>{% trans "Total Courses" %}: {{ instructor.total_courses }}</p>
-            <h3>{% trans "Courses by this instructor" %}</h3>
-            <ul>
-                {% for course in courses %}
-                    <li>
-                        <a href="{% url 'courses:course_detail' course.slug %}">{{ course.title }}</a>
-                    </li>
-                {% empty %}
-                    <li>{% trans "No courses found." %}</li>
-                {% endfor %}
-            </ul>
+    <!-- Breadcrumb -->
+    <div class="bg-light py-3">
+        <div class="container">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-decoration-none">{% trans "Home" %}</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'courses:course_list' %}" class="text-decoration-none">{% trans "Courses" %}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{% trans "Instructor" %}</li>
+                </ol>
+            </nav>
         </div>
     </div>
-</div>
+    
+    <!-- Instructor Profile Header -->
+    <div class="bg-primary text-white py-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-3 text-center text-lg-start mb-4 mb-lg-0">
+                    {% if instructor.user.avatar %}
+                        <img src="{{ instructor.user.avatar.url }}" alt="{{ instructor.user.get_full_name }}" class="rounded-circle shadow-lg" style="width: 200px; height: 200px; object-fit: cover;">
+                    {% elif instructor.user.profile_picture_url %}
+                        <img src="{{ instructor.user.profile_picture_url }}" alt="{{ instructor.user.get_full_name }}" class="rounded-circle shadow-lg" style="width: 200px; height: 200px; object-fit: cover;">
+                    {% else %}
+                        <div class="bg-white rounded-circle shadow-lg mx-auto d-flex align-items-center justify-content-center" style="width: 200px; height: 200px;">
+                            <i class="fas fa-user fa-5x text-primary"></i>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="col-lg-9">
+                    <h1 class="display-5 fw-bold mb-3">{{ instructor.user.get_full_name|default:instructor.user.username }}</h1>
+                    {% if instructor.title %}
+                        <p class="lead mb-3">{{ instructor.title }}</p>
+                    {% endif %}
+                    {% if instructor.bio %}
+                        <p class="text-white-75 mb-4">{{ instructor.bio|truncatewords:30 }}</p>
+                    {% endif %}
+                    
+                    <!-- Instructor Stats -->
+                    <div class="row g-3">
+                        {% if instructor.expertise %}
+                        <div class="col-auto">
+                            <div class="d-flex align-items-center text-white-75">
+                                <i class="fas fa-star me-2"></i>
+                                <span>{{ instructor.expertise }}</span>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if instructor.experience_years %}
+                        <div class="col-auto">
+                            <div class="d-flex align-items-center text-white-75">
+                                <i class="fas fa-calendar-alt me-2"></i>
+                                <span>{{ instructor.experience_years }} {% trans "years experience" %}</span>
+                            </div>
+                        </div>
+                        {% endif %}
+                        <div class="col-auto">
+                            <div class="d-flex align-items-center text-white-75">
+                                <i class="fas fa-graduation-cap me-2"></i>
+                                <span>{{ courses.count }} {% trans "courses" %}</span>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="d-flex align-items-center text-white-75">
+                                <i class="fas fa-users me-2"></i>
+                                <span>{{ total_students|default:0 }} {% trans "students" %}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="container py-5">
+        <div class="row g-5">
+            <!-- About Section -->
+            <div class="col-lg-8">
+                {% if instructor.bio %}
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <h3 class="fw-bold mb-3">
+                            <i class="fas fa-user-circle text-primary me-2"></i>
+                            {% trans "About" %}
+                        </h3>
+                        <div class="text-muted lh-lg">{{ instructor.bio|linebreaks }}</div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Courses Section -->
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-0 p-4">
+                        <h3 class="fw-bold mb-0">
+                            <i class="fas fa-graduation-cap text-primary me-2"></i>
+                            {% trans "Courses" %}
+                        </h3>
+                        <p class="text-muted mb-0 mt-2">{{ courses.count }} {% trans "courses available" %}</p>
+                    </div>
+                    <div class="card-body p-4">
+                        {% if courses %}
+                            <div class="row g-4">
+                                {% for course in courses %}
+                                    <div class="col-md-6">
+                                        <div class="card border-0 shadow-sm h-100">
+                                            {% if course.thumbnail %}
+                                                <img src="{{ course.thumbnail.url }}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="{{ course.title }}">
+                                            {% else %}
+                                                <div class="bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                                    <i class="fas fa-play-circle fa-3x text-muted"></i>
+                                                </div>
+                                            {% endif %}
+                                            <div class="card-body p-3">
+                                                <h5 class="card-title fw-bold mb-2">
+                                                    <a href="{% url 'courses:course_detail' course.slug %}" class="text-decoration-none text-dark">
+                                                        {{ course.title }}
+                                                    </a>
+                                                </h5>
+                                                <p class="card-text text-muted small mb-3">{{ course.description|truncatewords:15 }}</p>
+                                                
+                                                <!-- Course Meta -->
+                                                <div class="d-flex align-items-center justify-content-between mb-3">
+                                                    <div class="d-flex align-items-center gap-3 small text-muted">
+                                                        {% if course.rating %}
+                                                            <span>
+                                                                <i class="fas fa-star text-warning me-1"></i>
+                                                                {{ course.rating|floatformat:1 }}
+                                                            </span>
+                                                        {% endif %}
+                                                        {% if course.duration_hours %}
+                                                            <span>
+                                                                <i class="fas fa-clock me-1"></i>
+                                                                {{ course.duration_hours }}h
+                                                            </span>
+                                                        {% endif %}
+                                                        <span>
+                                                            <i class="fas fa-signal me-1"></i>
+                                                            {{ course.get_difficulty_display }}
+                                                        </span>
+                                                    </div>
+                                                    <div class="fw-bold text-primary">${{ course.price }}</div>
+                                                </div>
+                                                
+                                                <a href="{% url 'courses:course_detail' course.slug %}" class="btn btn-primary btn-sm w-100">
+                                                    {% trans "View Course" %}
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="text-center py-5">
+                                <i class="fas fa-graduation-cap fa-3x text-muted mb-3"></i>
+                                <p class="text-muted">{% trans "No courses available yet." %}</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Contact Card -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3">
+                            <i class="fas fa-envelope text-primary me-2"></i>
+                            {% trans "Contact" %}
+                        </h5>
+                        <div class="d-flex flex-column gap-3">
+                            {% if instructor.user.email %}
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-envelope text-muted me-3"></i>
+                                    <a href="mailto:{{ instructor.user.email }}" class="text-decoration-none">{{ instructor.user.email }}</a>
+                                </div>
+                            {% endif %}
+                            {% if instructor.user.phone_number %}
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-phone text-muted me-3"></i>
+                                    <span>{{ instructor.user.phone_number }}</span>
+                                </div>
+                            {% endif %}
+                            {% if instructor.website %}
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-globe text-muted me-3"></i>
+                                    <a href="{{ instructor.website }}" target="_blank" class="text-decoration-none">{% trans "Website" %}</a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Skills Card -->
+                {% if instructor.skills %}
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3">
+                            <i class="fas fa-cogs text-primary me-2"></i>
+                            {% trans "Skills" %}
+                        </h5>
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for skill in instructor.skills.all %}
+                                <span class="badge bg-light text-dark px-3 py-2">{{ skill.name }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Statistics Card -->
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3">
+                            <i class="fas fa-chart-bar text-primary me-2"></i>
+                            {% trans "Statistics" %}
+                        </h5>
+                        <div class="d-flex flex-column gap-3">
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted">{% trans "Total Courses" %}</span>
+                                <span class="fw-semibold">{{ courses.count }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted">{% trans "Total Students" %}</span>
+                                <span class="fw-semibold">{{ total_students|default:0 }}</span>
+                            </div>
+                            {% if average_rating %}
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted">{% trans "Average Rating" %}</span>
+                                <span class="fw-semibold">
+                                    <i class="fas fa-star text-warning me-1"></i>
+                                    {{ average_rating|floatformat:1 }}
+                                </span>
+                            </div>
+                            {% endif %}
+                            {% if instructor.experience_years %}
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted">{% trans "Experience" %}</span>
+                                <span class="fw-semibold">{{ instructor.experience_years }} {% trans "years" %}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

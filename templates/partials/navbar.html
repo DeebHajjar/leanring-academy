@@ -1,75 +1,131 @@
 {% load i18n %}
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
     <div class="container">
-        <a class="navbar-brand" href="{% url 'home' %}">{{ site_settings.site_name }}</a>
+        <a class="navbar-brand fw-bold" href="{% url 'home' %}">
+            <i class="fas fa-graduation-cap me-2"></i>
+            {{ site_settings.site_name }}
+        </a>
         
-        <!-- Language Switcher -->
-        <form action="{% url 'set_language_and_save' %}" method="post" class="d-inline">
-            {% csrf_token %}
-            <input type="hidden" name="next" value="{{ request.get_full_path }}">
-            <div class="dropdown d-inline">
-                <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                    {% if LANGUAGE_CODE == 'ar' %}العربية{% else %}English{% endif %}
-                </button>
-                <ul class="dropdown-menu">
-                    <li>
-                        <button class="dropdown-item" type="submit" name="language" value="ar">العربية</button>
-                    </li>
-                    <li>
-                        <button class="dropdown-item" type="submit" name="language" value="en">English</button>
-                    </li>
-                </ul>
+        <!-- Mobile Toggle Button -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <!-- Main Navigation -->
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'courses:course_list' %}">
+                        <i class="fas fa-book me-1"></i>
+                        {% trans 'All Courses' %}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'courses:my_courses' %}">
+                        <i class="fas fa-user-graduate me-1"></i>
+                        {% trans 'My Courses' %}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'blog:article_list' %}">
+                        <i class="fas fa-blog me-1"></i>
+                        {% trans 'Blog' %}
+                    </a>
+                </li>
+                
+                <!-- Admin Link -->
+                {% if request.user.is_superuser %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'admin:index' %}">
+                        <i class="fas fa-cog me-1"></i>
+                        {% trans 'Admin' %}
+                    </a>
+                </li>
+                {% endif %}
+                
+                <!-- Instructor/Admin Blog Management -->
+                {% if request.user.is_authenticated and request.user.is_superuser or request.user.is_staff or request.user.is_instructor %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-edit me-1"></i>
+                        {% trans 'Blog Management' %}
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{% url 'blog:my_articles' %}">
+                            <i class="fas fa-list me-2"></i>
+                            {% trans 'My Articles' %}
+                        </a></li>
+                        <li><a class="dropdown-item" href="{% url 'blog:article_create' %}">
+                            <i class="fas fa-plus me-2"></i>
+                            {% trans 'Write Article' %}
+                        </a></li>
+                    </ul>
+                </li>
+                {% endif %}
+            </ul>
+            
+            <!-- Right Side Navigation -->
+            <div class="d-flex align-items-center justify-content-evenly">
+                <!-- Language Switcher -->
+                <form action="{% url 'set_language_and_save' %}" method="post" class="me-3">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-light btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-globe me-1"></i>
+                            {% if LANGUAGE_CODE == 'ar' %}العربية{% else %}English{% endif %}
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <button class="dropdown-item" type="submit" name="language" value="ar">
+                                    <i class="fas fa-flag me-2"></i>
+                                    العربية
+                                </button>
+                            </li>
+                            <li>
+                                <button class="dropdown-item" type="submit" name="language" value="en">
+                                    <i class="fas fa-flag me-2"></i>
+                                    English
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+                
+                <!-- User Authentication Links -->
+                {% if request.user.is_authenticated %}
+                <div class="dropdown">
+                    <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-user me-1"></i>
+                        {{ request.user.get_full_name|default:request.user.username }}
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="{% url 'profile' request.user.username %}">
+                            <i class="fas fa-user-circle me-2"></i>
+                            {% trans 'Profile' %}
+                        </a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{% url 'account_logout' %}">
+                            <i class="fas fa-sign-out-alt me-2"></i>
+                            {% trans 'Logout' %}
+                        </a></li>
+                    </ul>
+                </div>
+                {% else %}
+                <div class="d-flex gap-2">
+                    <a href="{% url 'login' %}" class="btn btn-outline-light btn-sm">
+                        <i class="fas fa-sign-in-alt me-1"></i>
+                        {% trans 'Login' %}
+                    </a>
+                    <a href="{% url 'signup' %}" class="btn btn-light btn-sm">
+                        <i class="fas fa-user-plus me-1"></i>
+                        {% trans 'Sign Up' %}
+                    </a>
+                </div>
+                {% endif %}
             </div>
-        </form>
-        <ul class="navbar-nav ms-auto">
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'courses:course_list' %}">{% trans 'All Courses' %}</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'courses:my_courses' %}">{% trans 'My Courses' %}</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'blog:article_list' %}">{% trans 'Blog' %}</a>
-            </li>
-            <!-- Admin -->
-            {% if request.user.is_superuser %}
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'admin:index' %}">{% trans 'Admin' %}</a>
-            </li>
-            {% endif %}
-            <!-- Instructor/Admin Blog Management -->
-            {% if request.user.is_authenticated and request.user.is_superuser or request.user.is_staff or request.user.user_type == 'instructor' %}
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                    {% trans 'Blog Management' %}
-                </a>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="{% url 'blog:my_articles' %}">{% trans 'My Articles' %}</a></li>
-                    <li><a class="dropdown-item" href="{% url 'blog:article_create' %}">{% trans 'Write Article' %}</a></li>
-                </ul>
-            </li>
-            {% endif %}
-        </ul>
-            {% if request.user.is_authenticated %}
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'profile' request.user.username %}">{% trans 'Profile' %}</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'account_logout' %}">{% trans 'Logout' %}</a>
-                </li>
-            </ul>
-            {% else %}
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'login' %}">{% trans 'Login' %}</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'signup' %}">{% trans 'Sign Up' %}</a>
-                </li>
-            </ul>
-            {% endif %}
+        </div>
 
     </div>
 </nav>

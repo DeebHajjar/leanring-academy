@@ -1,14 +1,93 @@
 {% load i18n %}
 
-<footer class="bg-dark text-light py-4 mt-5">
+<footer class="bg-dark text-light py-5 mt-auto">
     <div class="container">
-        <div class="row">
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6">
+                <h5 class="fw-bold mb-3">
+                    <i class="fas fa-graduation-cap me-2 text-primary"></i>
+                    {{ site_settings.site_name }}
+                </h5>
+                <p class="text-white">
+                    {% trans 'Your gateway to knowledge and success. Join thousands of learners on their educational journey.' %}
+                </p>
+            </div>
+            
+            <div class="col-lg-2 col-md-6">
+                <h6 class="fw-bold mb-3">{% trans 'Quick Links' %}</h6>
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <a href="{% url 'courses:course_list' %}" class="text-white text-decoration-none">
+                            <i class="fas fa-book me-1"></i>
+                            {% trans 'All Courses' %}
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="{% url 'blog:article_list' %}" class="text-white text-decoration-none">
+                            <i class="fas fa-blog me-1"></i>
+                            {% trans 'Blog' %}
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+                <h6 class="fw-bold mb-3">{% trans 'Support' %}</h6>
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <a href="#" class="text-white text-decoration-none">
+                            <i class="fas fa-question-circle me-1"></i>
+                            {% trans 'Help Center' %}
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="#" class="text-white text-decoration-none">
+                            <i class="fas fa-envelope me-1"></i>
+                            {% trans 'Contact Us' %}
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+                <h6 class="fw-bold mb-3">{% trans 'Follow Us' %}</h6>
+                <div class="d-flex gap-3">
+                    <a href="#" class="text-light-emphasis fs-4">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="#" class="text-light-emphasis fs-4">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="text-light-emphasis fs-4">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                    <a href="#" class="text-light-emphasis fs-4">
+                        <i class="fab fa-youtube"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <hr class="my-4 text-white">
+        
+        <div class="row align-items-center">
             <div class="col-md-6">
-                <p>&copy; 2025 {{ site_settings.site_name }}. {% trans 'All rights reserved.' %}</p>
+                <p class="mb-0 text-white">
+                    &copy; 2025 {{ site_settings.site_name }}. {% trans 'All rights reserved.' %}
+                </p>
+                <p class="mb-0 text-white">
+                    {% trans 'Developed by '%} <a href="https://github.com/DeebHajjar" target="_blank" class="text-white hover:text-primary text-decoration-none">Deeb Hajjar</a>
+                </p>
             </div>
             <div class="col-md-6 text-md-end">
-                <a href="#" class="text-light me-2">{% trans 'Privacy Policy' %}</a>
-                <a href="#" class="text-light me-2">{% trans 'Terms of Use' %}</a>
+                <a href="#" class="text-white text-decoration-none me-3">
+                    <i class="fas fa-shield-alt me-1"></i>
+                    {% trans 'Privacy Policy' %}
+                </a>
+                <a href="#" class="text-white text-decoration-none">
+                    <i class="fas fa-file-contract me-1"></i>
+                    {% trans 'Terms of Use' %}
+                </a>
             </div>
         </div>
     </div>

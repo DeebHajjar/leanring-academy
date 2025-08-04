@@ -1,87 +1,154 @@
 {% extends 'base.html' %}
 {% load i18n %}
 
-{% block title %}{% trans 'Home' %}{% endblock %}
+{% block title %}{% trans 'Home' %} - {{ site_settings.site_name }}{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="row align-items-center">
-        <div class="col-lg-6 mb-4 mb-lg-0">
-            <h1 class="display-4 fw-bold mb-3 text-primary">
-                {% trans "Welcome to" %} <span class="text-success">{{ site_settings.site_name }}</span>
-            </h1>
-            <p class="lead mb-4">
-                {% trans "Your gateway to knowledge, creativity, and success. Start your learning journey with us!" %}
-            </p>
-            <a href="#" class="btn btn-success btn-lg px-4 py-2 me-2">{% trans "Browse Courses" %}</a>
-            <a href="#" class="btn btn-outline-primary btn-lg px-4 py-2">{% trans "Contact Us" %}</a>
-        </div>
-        <div class="col-lg-6 text-center">
-            {% if site_settings.logo %}
-                <img src="{{ site_settings.logo.url }}" alt="{{ site_settings.site_name }}" class="img-fluid rounded shadow" style="max-height: 320px;">
-            {% else %}
-                <img src="https://cdn.pixabay.com/photo/2017/01/10/19/05/education-1976107_960_720.png" alt="Learning" class="img-fluid rounded shadow" style="max-height: 320px;">
-            {% endif %}
-        </div>
-    </div>
-    <div class="row mt-5">
-        <div class="col-12 text-center">
-            <h2 class="fw-bold mb-4">{% trans "Why Choose Us?" %}</h2>
-        </div>
-        <div class="col-md-4 text-center mb-4">
-            <div class="card border-0 shadow h-100">
-                <div class="card-body">
-                    <i class="bi bi-mortarboard-fill display-4 text-success mb-3"></i>
-                    <h5 class="card-title">{% trans "Expert Instructors" %}</h5>
-                    <p class="card-text">{% trans "Learn from experienced and passionate teachers." %}</p>
+<!-- Hero Section -->
+<section class="bg-primary text-white py-5">
+    <div class="container py-5">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-4">
+                    {% trans "Welcome to" %} 
+                    <span class="text-warning">{{ site_settings.site_name }}</span>
+                </h1>
+                <p class="lead mb-4">
+                    {% trans "Your gateway to knowledge, creativity, and success. Start your learning journey with us and unlock your potential!" %}
+                </p>
+                <div class="d-flex flex-column flex-sm-row gap-3">
+                    <a href="{% url 'courses:course_list' %}" class="btn btn-warning btn-lg px-4 py-3">
+                        <i class="fas fa-book me-2"></i>
+                        {% trans "Browse Courses" %}
+                    </a>
+                    <a href="{% url 'blog:article_list' %}" class="btn btn-outline-light btn-lg px-4 py-3">
+                        <i class="fas fa-blog me-2"></i>
+                        {% trans "Read Blog" %}
+                    </a>
                 </div>
             </div>
-        </div>
-        <div class="col-md-4 text-center mb-4">
-            <div class="card border-0 shadow h-100">
-                <div class="card-body">
-                    <i class="bi bi-laptop-fill display-4 text-primary mb-3"></i>
-                    <h5 class="card-title">{% trans "Modern Platform" %}</h5>
-                    <p class="card-text">{% trans "Enjoy an interactive and user-friendly learning experience." %}</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4 text-center mb-4">
-            <div class="card border-0 shadow h-100">
-                <div class="card-body">
-                    <i class="bi bi-people-fill display-4 text-warning mb-3"></i>
-                    <h5 class="card-title">{% trans "Community Support" %}</h5>
-                    <p class="card-text">{% trans "Join a vibrant community of learners and educators." %}</p>
-                </div>
+            <div class="col-lg-6 text-center">
+                {% if site_settings.logo %}
+                    <img src="{{ site_settings.logo.url }}" alt="{{ site_settings.site_name }}" class="img-fluid rounded-4 shadow-lg" style="max-height: 400px;">
+                {% else %}
+                    <div class="bg-white rounded-4 shadow-lg p-5">
+                        <i class="fas fa-graduation-cap text-primary" style="font-size: 8rem;"></i>
+                        <h3 class="text-primary mt-3">{{ site_settings.site_name }}</h3>
+                    </div>
+                {% endif %}
             </div>
         </div>
     </div>
-    <div class="col-12 text-center">
-        <h2 class="fw-bold mb-4">{% trans "Featured Courses" %}</h2>
-    </div>
-    {% if courses %}
-        <div class="row mt-5">
-            {% for course in courses %}
-            {% if course.is_featured and course.status == 'published' %}
-                <div class="col-md-4 mb-4">
-                    <div class="card h-100">
-                        <img src="{{ course.thumbnail.url }}" class="card-img-top" alt="{{ course.title }}">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ course.title }}</h5>
-                            <p class="card-text">{{ course.short_description }}</p>
-                            <a href="{% url 'courses:course_detail' course.slug %}" class="btn btn-primary">{% trans "View Course" %}</a>
+</section>
+<!-- Features Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center mb-5">
+                <h2 class="display-5 fw-bold text-primary mb-3">{% trans "Why Choose Us?" %}</h2>
+                <p class="lead text-muted">{% trans "Discover what makes our learning platform special" %}</p>
+            </div>
+        </div>
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6">
+                <div class="card border-0 shadow-sm h-100 text-center">
+                    <div class="card-body p-4">
+                        <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                            <i class="fas fa-chalkboard-teacher fs-1 text-success"></i>
                         </div>
+                        <h5 class="card-title fw-bold mb-3">{% trans "Expert Instructors" %}</h5>
+                        <p class="card-text text-muted">{% trans "Learn from experienced and passionate teachers who are experts in their fields." %}</p>
                     </div>
                 </div>
-            {% endif %}
-            {% endfor %}
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="card border-0 shadow-sm h-100 text-center">
+                    <div class="card-body p-4">
+                        <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                            <i class="fas fa-laptop fs-1 text-primary"></i>
+                        </div>
+                        <h5 class="card-title fw-bold mb-3">{% trans "Modern Platform" %}</h5>
+                        <p class="card-text text-muted">{% trans "Enjoy an interactive and user-friendly learning experience with cutting-edge technology." %}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="card border-0 shadow-sm h-100 text-center">
+                    <div class="card-body p-4">
+                        <div class="bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                            <i class="fas fa-users fs-1 text-warning"></i>
+                        </div>
+                        <h5 class="card-title fw-bold mb-3">{% trans "Community Support" %}</h5>
+                        <p class="card-text text-muted">{% trans "Join a vibrant community of learners and educators supporting each other." %}</p>
+                    </div>
+                </div>
+            </div>
         </div>
-    {% elif not courses.is_featured %}
-    <p class="text-center">{% trans "No courses available." %}</p>
-    {% endif %}
-</div>
-
-
-<!-- Bootstrap Icons CDN -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    </div>
+</section>
+<!-- Featured Courses Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center mb-5">
+                <h2 class="display-5 fw-bold text-primary mb-3">{% trans "Featured Courses" %}</h2>
+                <p class="lead text-muted">{% trans "Explore our most popular and highly-rated courses" %}</p>
+            </div>
+        </div>
+        {% if courses %}
+            <div class="row g-4">
+                {% for course in courses %}
+                {% if course.is_featured and course.status == 'published' %}
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card border-0 shadow-sm h-100">
+                            {% if course.thumbnail %}
+                                <img src="{{ course.thumbnail.url }}" class="card-img-top" alt="{{ course.title }}" style="height: 200px; object-fit: cover;">
+                            {% else %}
+                                <div class="card-img-top bg-primary d-flex align-items-center justify-content-center" style="height: 200px;">
+                                    <i class="fas fa-book text-white" style="font-size: 3rem;"></i>
+                                </div>
+                            {% endif %}
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title fw-bold mb-3">{{ course.title }}</h5>
+                                <p class="card-text text-muted flex-grow-1">{{ course.short_description|truncatewords:15 }}</p>
+                                <div class="mt-auto">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <small class="text-muted">
+                                            <i class="fas fa-user me-1"></i>
+                                            {{ course.instructor.user.get_full_name|default:course.instructor.user.username }}
+                                        </small>
+                                        {% if course.price > 0 %}
+                                            <span class="badge bg-success">${{ course.price }}</span>
+                                        {% else %}
+                                            <span class="badge bg-primary">{% trans "Free" %}</span>
+                                        {% endif %}
+                                    </div>
+                                    <a href="{% url 'courses:course_detail' course.slug %}" class="btn btn-primary w-100">
+                                        <i class="fas fa-eye me-2"></i>
+                                        {% trans "View Course" %}
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="row">
+                <div class="col-12 text-center">
+                    <div class="py-5">
+                        <i class="fas fa-book-open text-muted" style="font-size: 4rem;"></i>
+                        <h4 class="text-muted mt-3">{% trans "No featured courses available yet" %}</h4>
+                        <p class="text-muted">{% trans "Check back soon for exciting new courses!" %}</p>
+                        <a href="{% url 'courses:course_list' %}" class="btn btn-primary">
+                            <i class="fas fa-search me-2"></i>
+                            {% trans "Browse All Courses" %}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</section>
 {% endblock %}

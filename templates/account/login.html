@@ -2,29 +2,36 @@
 {% load i18n %}
 {% load socialaccount %}
 
-{% block title %}{% trans "Login" %}{% endblock %}
+{% block title %}{% trans "Login" %} - {{ block.super }}{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
+<div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white text-center">
-                    <h3>{% trans "Login" %}</h3>
-                </div>
-                <div class="card-body">
+        <div class="col-lg-5 col-md-7">
+            <!-- Login Card -->
+            <div class="card border-0 shadow-lg">
+                <div class="card-body p-5">
+                    <!-- Header -->
+                    <div class="text-center mb-4">
+                        <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                            <i class="fas fa-sign-in-alt text-primary" style="font-size: 2rem;"></i>
+                        </div>
+                        <h2 class="fw-bold text-dark mb-2">{% trans "Welcome Back" %}</h2>
+                        <p class="text-muted">{% trans "Sign in to your account to continue" %}</p>
+                    </div>
                     <!-- Google Login -->
-                    <div class="d-grid gap-2 mb-4">
+                    <div class="d-grid mb-4">
                         <a href="{% provider_login_url 'google' %}" 
-                           class="btn btn-danger btn-lg">
+                           class="btn btn-danger btn-lg py-3">
                             <i class="fab fa-google me-2"></i>
-                            {% trans "Login with Google" %}
+                            {% trans "Continue with Google" %}
                         </a>
                     </div>
                     
                     <!-- Divider -->
-                    <div class="text-center my-3">
-                        <span class="text-muted">{% trans "or" %}</span>
+                    <div class="position-relative text-center my-4">
+                        <hr class="my-0">
+                        <span class="position-absolute top-50 start-50 translate-middle bg-white px-3 text-muted">{% trans "or" %}</span>
                     </div>
                     
                     <!-- Traditional Login Form -->
@@ -33,73 +40,84 @@
 
                         <!-- Error Messages -->
                         {% if form.non_field_errors %}
-                            <div class="alert alert-danger">
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
                                 {% for error in form.non_field_errors %}
                                     <div>{{ error }}</div>
                                 {% endfor %}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                             </div>
                         {% endif %}
                         
                         <div class="mb-3">
-                            <label for="id_login" class="form-label">
-                                {% trans "Email" %}
+                            <label for="id_login" class="form-label fw-semibold">
+                                <i class="fas fa-envelope me-2 text-primary"></i>
+                                {% trans "Email Address" %}
                             </label>
                             <input type="email" 
-                                   class="form-control" 
+                                   class="form-control form-control-lg" 
                                    id="id_login" 
                                    name="login" 
+                                   placeholder="{% trans 'Enter your email' %}"
                                    required>
                             {% if form.login.errors %}
-                                <div class="text-danger">
+                                <div class="invalid-feedback d-block">
+                                    <i class="fas fa-exclamation-circle me-1"></i>
                                     {{ form.login.errors.0 }}
                                 </div>
                             {% endif %}
                         </div>
                         
-                        <div class="mb-3">
-                            <label for="id_password" class="form-label">
+                        <div class="mb-4">
+                            <label for="id_password" class="form-label fw-semibold">
+                                <i class="fas fa-lock me-2 text-primary"></i>
                                 {% trans "Password" %}
                             </label>
-                            <input type="password" 
-                                   class="form-control" 
-                                   id="id_password" 
-                                   name="password" 
-                                   required>
+                            <div class="position-relative">
+                                <input type="password" 
+                                       class="form-control form-control-lg" 
+                                       id="id_password" 
+                                       name="password" 
+                                       placeholder="{% trans 'Enter your password' %}"
+                                       required>
+                            </div>
                             {% if form.password.errors %}
-                                <div class="text-danger">
+                                <div class="invalid-feedback d-block">
+                                    <i class="fas fa-exclamation-circle me-1"></i>
                                     {{ form.password.errors.0 }}
                                 </div>
                             {% endif %}
                         </div>
                         
-                        <div class="mb-3 form-check">
-                            <input type="checkbox" 
-                                   class="form-check-input" 
-                                   id="id_remember" 
-                                   name="remember">
-                            <label class="form-check-label" for="id_remember">
-                                {% trans "Remember me" %}
-                            </label>
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div class="form-check">
+                                <input type="checkbox" 
+                                       class="form-check-input" 
+                                       id="id_remember" 
+                                       name="remember">
+                                <label class="form-check-label text-muted" for="id_remember">
+                                    {% trans "Remember me" %}
+                                </label>
+                            </div>
+                            <a href="{% url 'account_reset_password' %}" class="text-decoration-none">
+                                {% trans "Forgot Password?" %}
+                            </a>
                         </div>
                         
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary">
-                                {% trans "Login" %}
+                        <div class="d-grid mb-4">
+                            <button type="submit" class="btn btn-primary btn-lg py-3">
+                                <i class="fas fa-sign-in-alt me-2"></i>
+                                {% trans "Sign In" %}
                             </button>
                         </div>
                     </form>
                     
-                    <!-- Additional Links -->
-                    <div class="text-center mt-3">
-                        <p>
-                            <a href="{% url 'account_reset_password' %}">
-                                {% trans "Forgot Password?" %}
-                            </a>
-                        </p>
-                        <p>
+                    <!-- Sign Up Link -->
+                    <div class="text-center">
+                        <p class="text-muted mb-0">
                             {% trans "Don't have an account?" %}
-                            <a href="{% url 'account_signup' %}">
-                                {% trans "Create New Account" %}
+                            <a href="{% url 'account_signup' %}" class="text-decoration-none fw-semibold">
+                                {% trans "Create Account" %}
                             </a>
                         </p>
                     </div>

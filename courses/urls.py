@@ -11,6 +11,7 @@ urlpatterns = [
     path('my-courses/', views.my_courses, name='my_courses'),
     path('my-courses/<slug:course_slug>/', views.my_lessons, name='my_lessons'),
     path('comment/<int:lesson_id>/', views.add_comment, name='add_comment'),
+    path('reply/<int:comment_id>/', views.add_reply, name='add_reply'),
     path('update-lesson-progress/<int:lesson_id>/', views.update_lesson_progress, name='update_lesson_progress'),
     path('instructor/<str:instructor_username>/', views.instructor_detail, name='instructor_detail'),
 ]

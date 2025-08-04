@@ -4,47 +4,93 @@
 {% block title %}{{ article.title }} - {% trans "Blog" %} - {{ block.super }}{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="row">
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-decoration-none">{% trans "Home" %}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'blog:article_list' %}" class="text-decoration-none">{% trans "Blog" %}</a></li>
+            {% if article.category %}
+            <li class="breadcrumb-item"><a href="{% url 'blog:category_articles' article.category.slug %}" class="text-decoration-none">{{ article.category.name }}</a></li>
+            {% endif %}
+            <li class="breadcrumb-item active" aria-current="page">{{ article.title|truncatewords:5 }}</li>
+        </ol>
+    </nav>
+    
+    <div class="row g-4">
         <!-- Main Content -->
         <div class="col-lg-8">
             <!-- Article -->
-            <article class="card">
+            <article class="card border-0 shadow-sm">
                 {% if article.featured_image %}
-                <img src="{{ article.featured_image.url }}" class="card-img-top" alt="{{ article.title }}" style="max-height: 400px; object-fit: cover;">
+                <div class="position-relative">
+                    <img src="{{ article.featured_image.url }}" class="card-img-top rounded-top" alt="{{ article.title }}" style="height: 400px; object-fit: cover;">
+                    {% if article.is_featured %}
+                    <span class="position-absolute top-0 start-0 m-3 badge bg-warning text-dark">
+                        <i class="fas fa-star me-1"></i>
+                        {% trans "Featured" %}
+                    </span>
+                    {% endif %}
+                </div>
                 {% endif %}
                 
-                <div class="card-body">
+                <div class="card-body p-4">
                     <!-- Article Meta -->
-                    <div class="mb-3">
-                        {% if article.is_featured %}
-                        <span class="badge bg-warning text-dark me-2">{% trans "Featured" %}</span>
-                        {% endif %}
-                        {% if article.category %}
-                        <a href="{% url 'blog:category_articles' article.category.slug %}" class="badge bg-secondary text-decoration-none me-2">
-                            {{ article.category.name }}
-                        </a>
-                        {% endif %}
-                        {% for tag in article.tags.all %}
-                        <a href="{% url 'blog:tag_articles' tag.slug %}" class="badge bg-info text-decoration-none me-1">
-                            #{{ tag.name }}
-                        </a>
-                        {% endfor %}
+                    <div class="mb-4">
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                            {% if article.category %}
+                            <a href="{% url 'blog:category_articles' article.category.slug %}" class="badge bg-primary text-decoration-none">
+                                <i class="fas fa-folder me-1"></i>
+                                {{ article.category.name }}
+                            </a>
+                            {% endif %}
+                            {% for tag in article.tags.all %}
+                            <a href="{% url 'blog:tag_articles' tag.slug %}" class="badge bg-secondary text-decoration-none">
+                                <i class="fas fa-tag me-1"></i>
+                                {{ tag.name }}
+                            </a>
+                            {% endfor %}
+                        </div>
                     </div>
 
                     <!-- Title -->
-                    <h1 class="card-title">{{ article.title }}</h1>
+                    <h1 class="display-5 fw-bold mb-4 text-dark">{{ article.title }}</h1>
 
-                    <!-- Author & Date -->
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <div class="d-flex align-items-center">
-                            <div>
-                                <strong>{% trans "By" %} {{ article.author.get_full_name }}</strong><br>
-                                <small class="text-muted">{{ article.published_at|date:"F d, Y" }}</small>
+                    <!-- Author & Meta Info -->
+                    <div class="row align-items-center mb-4 p-3 bg-light rounded">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center">
+                                    {% if article.author.avatar %}
+                                        <img src="{{ article.author.avatar.url }}" class="rounded-circle me-2" style="width: 35px; height: 35px; object-fit: cover;" alt="{{ article.author.get_full_name }}">
+                                    {% else %}
+                                    {% if article.author.profile_picture_url %}
+                                        <img src="{{ article.author.profile_picture_url }}" class="rounded-circle me-2" style="width: 35px; height: 35px; object-fit: cover;" alt="{{ article.author.get_full_name }}">
+                                    {% else %}
+                                        <div class="bg-secondary rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;">
+                                            <i class="fas fa-user text-white small"></i>
+                                        </div>
+                                    {% endif %}
+                                    {% endif %}
+                                <div>
+                                    <h6 class="mb-0 fw-bold">{{ article.author.get_full_name|default:article.author.username }}</h6>
+                                    <small class="text-muted">
+                                        <i class="fas fa-calendar me-1"></i>
+                                        {{ article.published_at|date:"F d, Y" }}
+                                    </small>
+                                </div>
                             </div>
                         </div>
-                        <div class="text-muted">
-                            <i class="fas fa-eye"></i> {{ article.views_count }} {% trans "views" %}
+                        <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                            <div class="d-flex justify-content-md-end gap-3">
+                                <span class="text-muted">
+                                    <i class="fas fa-eye me-1"></i>
+                                    {{ article.views_count }} {% trans "views" %}
+                                </span>
+                                <span class="text-muted">
+                                    <i class="fas fa-clock me-1"></i>
+                                    {% trans "5 min read" %}
+                                </span>
+                            </div>
                         </div>
                     </div>
 
