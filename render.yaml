@@ -7,8 +7,9 @@ services:
   - type: web
     name: learning-academy
     env: python
-    buildCommand: "./build.sh"
+    buildCommand: "./render-build.sh"
     startCommand: "gunicorn project.wsgi:application"
+    plan: free
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -17,7 +18,7 @@ services:
       - key: SECRET_KEY
         generateValue: true
       - key: DEBUG
-        value: false
+        value: "False"
       - key: ALLOWED_HOSTS
         value: "learning-academy.onrender.com"
       - key: AWS_ACCESS_KEY_ID
@@ -38,3 +39,7 @@ services:
         sync: false
       - key: GOOGLE_OAUTH_CLIENT_SECRET
         sync: false
+      - key: PAYMENT_SUCCESS_URL
+        value: "https://learning-academy.onrender.com/payments/success/"
+      - key: PAYMENT_CANCEL_URL
+        value: "https://learning-academy.onrender.com/payments/cancel/"

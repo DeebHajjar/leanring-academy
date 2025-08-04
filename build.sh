@@ -8,11 +8,6 @@ echo "Starting build process..."
 echo "Updating pip..."
 pip install --upgrade pip
 
-# Install system dependencies for PostgreSQL
-echo "Installing system dependencies..."
-apt-get update
-apt-get install -y libpq-dev
-
 # Install Python dependencies
 echo "Installing Python dependencies..."
 pip install -r requirements.txt
