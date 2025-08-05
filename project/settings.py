@@ -248,6 +248,27 @@ if not DEBUG:
     CSRF_COOKIE_SECURE = True
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
+# Session Configuration
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Save sessions in database
+SESSION_COOKIE_AGE = 86400 * 30  # 30 days
+SESSION_COOKIE_NAME = 'learning_academy_sessionid'
+SESSION_COOKIE_HTTPONLY = True
+SESSION_SAVE_EVERY_REQUEST = True  # Save session in every request
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Do not expire session when browser is closed
+SESSION_COOKIE_SAMESITE = 'Lax'
+
+# In production only, make cookies secure
+if not DEBUG:
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+else:
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+
+# CSRF Configuration
+CSRF_COOKIE_AGE = 86400 * 30  # 30 days
+CSRF_COOKIE_HTTPONLY = False  # Should be False for JavaScript
+CSRF_COOKIE_SAMESITE = 'Lax'
 
 AWS_S3_FILE_OVERWRITE = False
 AWS_S3_SIGNATURE_VERSION = 's3v4'

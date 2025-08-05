@@ -106,10 +106,15 @@
                             {% trans 'Profile' %}
                         </a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="{% url 'account_logout' %}">
-                            <i class="fas fa-sign-out-alt me-2"></i>
-                            {% trans 'Logout' %}
-                        </a></li>
+                        <li>
+                            <form method="post" action="{% url 'account_logout' %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="dropdown-item border-0 bg-transparent">
+                                    <i class="fas fa-sign-out-alt me-2"></i>
+                                    {% trans 'Logout' %}
+                                </button>
+                            </form>
+                        </li>
                     </ul>
                 </div>
                 {% else %}
